@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<title>YouTube Auto Skip — 광고 재생 전 차단 검증</title>
+<script>window.originalPreventionParse = JSON.parse; window.originalPreventionFetch = fetch;</script>
+<script src="../anti-adblock.js"></script>
+<script src="../prevention.js"></script>
+<style>body{font:16px system-ui;margin:32px;background:#f6f8fa}li{margin:12px 0}.pass{color:#126d39}.fail{color:#b42318}</style>
+<h1>YouTube 자동 건너뛰기 v2.6.1 — 광고 데이터 사전 제거 검증</h1>
+<p id="status">검사 중</p><ol id="results"></ol>
+<script>
+const model = () => ({videoDetails:{videoId:"content",lengthSeconds:"900"},playabilityStatus:{status:"OK"},
+  streamingData:{formats:[{url:"content-stream"}]},captions:{keep:true},adPlacements:[1],adSlots:[2],playerAds:[3]});
+const endpoint = "https://www.youtube.com/youtubei/v1/player";
+function response(data, url = endpoint) {
+  const r = new Response(typeof data === "string" ? data : JSON.stringify(data),
+    {status:200,headers:{"content-type":"application/json","x-test":"kept"}});
+  Object.defineProperty(r,"url",{value:url}); return r;
+}
+function expect(condition, message) { if (!condition) throw Error(message); }
+async function run(name, fn) {
+  const li = document.createElement("li");
+  try { await fn();li.className="pass";li.textContent="PASS "+name; }
+  catch(e) {li.className="fail";li.textContent="FAIL "+name+" — "+e.message;}
+  document.querySelector("#results").append(li);
+}
+(async () => {
+  await run("광고 차단 감지 신호를 문서 시작에 고정", () => {
+    const descriptor = Object.getOwnPropertyDescriptor(window, "google_ad_status");
+    expect(window.google_ad_status === 1 && descriptor && descriptor.configurable === false,
+      "google_ad_status guard 미설치");
+    expect(window.youtubeAutoSkipAntiAdblock?.getStats().guardInstalled,
+      "guard 통계 미설치");
+  });
+  await run("초기 응답에서 광고 배치를 제거한 뒤 컴포넌트 생성 · 광고 프레임 0개", () => {
+    const r=model(), stream=r.streamingData;
+    // YouTube initializes this global with a classic script's var declaration.
+    window.fixturePlayerResponse=r;
+    const script=document.createElement("script");
+    script.textContent="var ytInitialPlayerResponse=window.fixturePlayerResponse;";
+    document.head.append(script);script.remove();delete window.fixturePlayerResponse;
+    const renderedAdFrames = r.adPlacements || r.adSlots || r.playerAds ? 1 : 0;
+    expect(renderedAdFrames===0,"광고가 컴포넌트에 전달됨");
+    expect(r.streamingData===stream&&r.captions.keep,"본문 데이터 변경");
+  });
+  await run("fetch JSON 소비 직전에 광고 데이터 제거", async () => {
+    const data=await response(model()).json();expect(!data.adSlots&&data.videoDetails.videoId==="content","광고 또는 본문 데이터 오류");
+  });
+  await run("fetch text 응답의 XSSI 접두사와 본문 유지", async () => {
+    const prefix=")]}'\n", text=await response(prefix+JSON.stringify([{playerResponse:model()}])).text();
+    expect(text.startsWith(prefix)&&!JSON.parse(text.slice(prefix.length))[0].playerResponse.playerAds,"텍스트 변환 실패");
+  });
+  await run("Response 인스턴스·헤더·상태와 bodyUsed 동작 유지", async () => {
+    const r=response(model());await r.json();expect(r instanceof Response&&r.url===endpoint&&r.status===200&&r.headers.get("x-test")==="kept"&&r.bodyUsed,"Response 정보 변경");
+    let failed=false;try{await r.json();}catch(e){failed=e instanceof TypeError;}expect(failed,"소비한 본문을 재사용함");
+  });
+  await run("네이티브 clone 본문의 독립적인 소비 유지", async () => {
+    const r=response(model()),clone=r.clone();await clone.json();expect(!r.bodyUsed,"원본 본문이 소비됨");
+    expect(!(await r.json()).adSlots,"원본 응답의 광고가 남음");
+  });
+  await run("다른 사이트와 YouTube browse 응답은 유지", async () => {
+    for(const url of ["https://example.com/player","https://www.youtube.com/youtubei/v1/browse"]){
+      expect((await response(model(),url).json()).adSlots[0]===2,"대상 밖 응답 변경");
+    }
+  });
+  await run("일반 JSON·reviver 동작과 fetch 원본 유지", () => {
+    expect(fetch===originalPreventionFetch,"fetch 원본 변경");
+    expect(JSON.parse('{"adSlots":[1]}').adSlots[0]===1,"일반 JSON 변경");
+    expect(JSON.parse('{"value":1}',(key,value)=>key==="value"?2:value).value===2,"reviver 변경");
+  });
+  await run("네이티브 XHR의 responseText 오류 계약 유지", () => {
+    const xhr=new XMLHttpRequest();xhr.responseType="arraybuffer";let failed=false;
+    try{void xhr.responseText;}catch(e){failed=e.name==="InvalidStateError";}
+    expect(failed,"XHR 오류 동작 변경");
+  });
+  await run("다음 초기 응답에도 반복 적용 · 본영상 재생 정보 유지", () => {
+    window.ytInitialPlayerResponse=model();expect(!ytInitialPlayerResponse.adPlacements&&ytInitialPlayerResponse.streamingData.formats[0].url==="content-stream","다음 영상 처리 실패");
+  });
+  await run("스트리밍 플레이어 프레임에서 콜백 전에 광고 정보 제거", () => {
+    const data=JSON.parse(JSON.stringify({responseType:"STREAMING_WATCH_RESPONSE_TYPE_PLAYER_RESPONSE",playerResponse:model(),account:{adSlots:[99]}}));
+    expect(!data.playerResponse.adSlots&&data.playerResponse.streamingData.formats[0].url==="content-stream"&&data.account.adSlots[0]===99,"스트리밍 프레임 처리 실패");
+  });
+  await run("다른 스트리밍 프레임과 일반 플레이어 JSON은 유지", () => {
+    const data=JSON.parse(JSON.stringify({responseType:"STREAMING_WATCH_RESPONSE_TYPE_WATCH_NEXT_RESPONSE",playerResponse:model()}));
+    expect(data.playerResponse.adSlots[0]===2&&JSON.parse(JSON.stringify(model())).adSlots[0]===2,"대상 밖 JSON 변경");
+  });
+  document.querySelector("#status").textContent=document.querySelector(".fail")?"검사 실패":"모든 검사 통과";
+})();
+</script>
+</html>

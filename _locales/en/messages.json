@@ -1,0 +1,56 @@
+{
+  "extensionName": {
+    "message": "YouTube Auto Skip + Adblock"
+  },
+  "extensionDescription": {
+    "message": "Block general ads and ad popups, with dedicated YouTube ad prevention, automatic skipping and bounded startup recovery."
+  },
+  "actionTitle": {
+    "message": "Ad blocking settings"
+  },
+  "popupTitle": {
+    "message": "Ad blocking"
+  },
+  "globalLabel": {
+    "message": "General ad blocking"
+  },
+  "siteSection": {
+    "message": "Current site"
+  },
+  "checkingSite": {
+    "message": "Checking site…"
+  },
+  "siteLabel": {
+    "message": "Block on this site"
+  },
+  "loadingSettings": {
+    "message": "Loading settings…"
+  },
+  "youtubeHint": {
+    "message": "YouTube ad skipping and interruption-notice hiding run independently of general blocking settings."
+  },
+  "checkingFilters": {
+    "message": "Checking filters…"
+  },
+  "filterSource": {
+    "message": "Filter sources"
+  },
+  "rulesError": {
+    "message": "Could not apply rules: $1"
+  },
+  "refreshHint": {
+    "message": "Reload the page after changing settings to apply them to new requests."
+  },
+  "unsupportedPage": {
+    "message": "Unavailable on this page."
+  },
+  "networkRules": {
+    "message": "$1 network rules"
+  },
+  "settingsError": {
+    "message": "Could not read settings: $1"
+  },
+  "parentPaused": {
+    "message": "Blocking is paused for $1. Re-enable it on that parent site."
+  }
+}

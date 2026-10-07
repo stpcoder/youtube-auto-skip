@@ -1,0 +1,62 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>v2.6.1 초기 버퍼링 복구 검증</title>
+<h1>v2.6.1 초기 버퍼링 복구 — Chromium 모의 검사</h1>
+<p>실제 DOM·JSON 직렬화를 사용합니다. YouTube 서버 우회 성공 검사가 아닙니다.</p>
+<pre id="result">검사 중…</pre>
+<iframe id="fixture" hidden></iframe>
+<script>
+(async () => {
+  const source = await (await fetch("../buffering-recovery.js")).text();
+  const frame = document.getElementById("fixture");
+  const w = frame.contentWindow, d = w.document;
+  d.body.innerHTML = '<div id="movie_player"><video></video></div>';
+  const player = d.getElementById("movie_player"), video = player.querySelector("video");
+  const listeners = new Map(), timers = [], loads = [], requests = [];
+  let now = 0, ready = 0, buffer = 0, paused = false, state = 3;
+  for (const [key, get] of Object.entries({ readyState: () => ready, buffered: () => ({ length: buffer }), paused: () => paused })) {
+    Object.defineProperty(video, key, { configurable: true, get });
+  }
+  const response = { videoDetails: { videoId: "fixture" }, playabilityStatus: { status: "OK" }, playerConfig: { playbackStartConfig: { startSeconds: 0 } } };
+  const original = w.JSON.parse(JSON.stringify({ videoId: "fixture", attestationRequest: { omitBotguardData: true },
+    context: { client: { clientName: "WEB", userAgent: "Mozilla/5.0 (Fixture)", clientScreen: "WATCH" } },
+    playbackContext: { contentPlaybackContext: { referer: "https://www.youtube.com/watch?v=fixture", lactMilliseconds: "0" } } }));
+  Object.assign(player, {
+    getPlayerResponse: () => response,
+    getStatsForNerds: () => ({ buffer_health_seconds: buffer ? "1.00 s" : "0.00 s", resolution: ready ? "1920x1080" : "0x0" }),
+    getPlayerState: () => state,
+    getPlayerStateObject: () => ({ isBuffering: state === 3 }),
+    getPresentingPlayerType: () => 1,
+    addEventListener: (name, fn) => listeners.set(name, fn),
+    removeEventListener: (name, fn) => { if (listeners.get(name) === fn) listeners.delete(name); },
+    loadVideoById: (id, start) => { loads.push([id, start]); requests.push(w.JSON.parse(w.JSON.stringify(original))); },
+  });
+  // Only the URL and clock are supplied by the fixture; DOM, video events,
+  // object prototypes and JSON are the browser iframe's actual implementations.
+  const run = new w.Function("location", "performance", "setTimeout", source);
+  run({ href: "https://www.youtube.com/watch?v=fixture" }, { now: () => now }, fn => { timers.push(fn); return timers.length; });
+  const results = [];
+  const check = (name, passed) => results.push({ name, passed: !!passed });
+  async function notice() { listeners.get("onSnackbarMessage")(1); await Promise.resolve(); }
+  function tick(ms) { now += ms; timers.shift()(); }
+  await notice();
+  check("eafg request sent before same-position reload", requests[0]?.params === "eAFgAQ" && loads[0][1] === 0);
+  check("original caller object not modified", original.context.client.clientScreen === "WATCH" && original.playbackContext.contentPlaybackContext.lactMilliseconds === "0");
+  check("request referer marker", requests[0]?.playbackContext.contentPlaybackContext.referer.endsWith("#reloadxhr"));
+  await notice();
+  check("duplicate event respects cooldown", loads.length === 1);
+  check("normal client screen preserved", requests[0]?.context.client.clientScreen === "WATCH");
+  check("lactMilliseconds preserved", requests[0]?.playbackContext.contentPlaybackContext.lactMilliseconds === "0");
+  check("unrelated JSON preserved", w.JSON.stringify({ x: 1 }) === '{"x":1}');
+  ready = 4; buffer = 1; state = 1;
+  video.dispatchEvent(new w.Event("playing"));
+  check("actual DOM playing event stops recovery", w.youtubeAutoSkipBufferingRecovery.getStats().stage === "playback-observed-after-retry");
+  tick(2000); await notice();
+  check("no reload after playback", loads.length === 1);
+  check("native request serialization restored", w.JSON.parse(w.JSON.stringify(original)).context.client.clientScreen === "WATCH");
+  check("one transform per retry", w.youtubeAutoSkipBufferingRecovery.getStats().requestTransforms === 1);
+  check("recovery status visible in DOM", JSON.parse(d.documentElement.dataset.youtubeAutoSkipRecoveryStatus).version === "2.6.1");
+  window.fixtureResults = results;
+  document.getElementById("result").textContent = `${results.filter(r => r.passed).length}/${results.length} 통과\n` + results.map(r => `${r.passed ? "PASS" : "FAIL"} ${r.name}`).join("\n");
+})().catch(error => { document.getElementById("result").textContent = `FAIL ${error.stack}`; });
+</script>

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<title>YouTube Auto Skip — JS 광고 감지 검증</title>
+<script src="../early.js"></script>
+<script>
+  window.injectedBeforeComponent = !document.querySelector("#movie_player") &&
+    typeof window.youtubeAutoSkip?.skipAd === "function";
+  window.ytInitialPlayerResponse = {
+    videoDetails: { videoId: "fixture", lengthSeconds: "900" },
+    playabilityStatus: { status: "OK" },
+    streamingData: { formats: [{ url: "content-video" }] },
+    captions: { keep: true }, adPlacements: [{ ad: true }], adSlots: [{ ad: true }],
+  };
+</script>
+<style>
+  body { font: 16px system-ui; margin: 32px; background: #f6f8fa; }
+  #movie_player { position: fixed; right: 40px; bottom: 40px; width: 300px; height: 120px; padding: 20px; background: #222; }
+  button { padding: 16px; }
+  li { margin: 12px 0; }
+  .pass { color: #126d39; } .fail { color: #b42318; }
+</style>
+<h1>YouTube 자동 건너뛰기 v2.6.1 — JS 광고 감지 → skipAd()</h1>
+<p id="status">검사 중</p>
+<ol id="results"></ol>
+<div id="player"><div id="movie_player" class="html5-video-player"></div></div>
+<script src="early-fixture.js"></script>
+<script src="../content.js"></script>
+</html>

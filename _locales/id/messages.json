@@ -1,0 +1,56 @@
+{
+  "extensionName": {
+    "message": "YouTube Auto Skip + Adblock"
+  },
+  "extensionDescription": {
+    "message": "Blokir iklan dan pop-up, cegah dan lewati iklan YouTube secara otomatis, serta coba pulihkan pemutaran awal."
+  },
+  "actionTitle": {
+    "message": "Pengaturan pemblokir iklan"
+  },
+  "popupTitle": {
+    "message": "Pemblokiran iklan"
+  },
+  "globalLabel": {
+    "message": "Blokir iklan umum"
+  },
+  "siteSection": {
+    "message": "Situs saat ini"
+  },
+  "checkingSite": {
+    "message": "Memeriksa situs…"
+  },
+  "siteLabel": {
+    "message": "Blokir di situs ini"
+  },
+  "loadingSettings": {
+    "message": "Memuat pengaturan…"
+  },
+  "youtubeHint": {
+    "message": "Pelewatan iklan dan penyembunyian notifikasi gangguan YouTube bekerja terpisah dari pengaturan pemblokiran umum."
+  },
+  "checkingFilters": {
+    "message": "Memeriksa filter…"
+  },
+  "filterSource": {
+    "message": "Sumber filter"
+  },
+  "rulesError": {
+    "message": "Tidak dapat menerapkan aturan: $1"
+  },
+  "refreshHint": {
+    "message": "Muat ulang halaman setelah mengubah pengaturan agar perubahan berlaku pada permintaan baru."
+  },
+  "unsupportedPage": {
+    "message": "Tidak tersedia di halaman ini."
+  },
+  "networkRules": {
+    "message": "$1 aturan jaringan"
+  },
+  "settingsError": {
+    "message": "Tidak dapat membaca pengaturan: $1"
+  },
+  "parentPaused": {
+    "message": "Pemblokiran dinonaktifkan untuk $1. Aktifkan kembali di situs induk tersebut."
+  }
+}

@@ -1,0 +1,22 @@
+import { cp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
+import { resolve, join } from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { checkPackage } from './check-package.mjs';
+
+const root = resolve(import.meta.dirname, '..');
+const { version } = await checkPackage(root);
+const build = join(root, 'build');
+const folder = join(build, 'youtube-auto-skip');
+await rm(folder, { recursive: true, force: true });
+await mkdir(folder, { recursive: true });
+const files = ['manifest.json', 'background.js', 'anti-adblock.js', 'prevention.js', 'buffering-recovery.js', 'early.js', 'content.js', 'interruption-notice.js', 'interruption-notice.css', 'general', '_locales', 'filters', 'LICENSE', 'THIRD_PARTY_NOTICES.md'];
+for (const file of files) await cp(join(root, file), join(folder, file), { recursive: true });
+const zipName = `youtube-auto-skip-${version}-preview.1.zip`;
+const zipPath = join(build, zipName);
+await rm(zipPath, { force: true });
+const zip = spawnSync('zip', ['-q', '-r', zipPath, 'youtube-auto-skip'], { cwd: build, stdio: 'inherit' });
+if (zip.status !== 0) throw Error('ZIP creation failed; install the zip command');
+const sha = createHash('sha256').update(await readFile(zipPath)).digest('hex');
+await writeFile(join(build, 'SHA256SUMS'), `${sha}  ${zipName}\n`);
+console.log(JSON.stringify({ zip: zipPath, sha256: sha }, null, 2));

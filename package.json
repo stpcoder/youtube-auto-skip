@@ -1,0 +1,25 @@
+{
+  "name": "youtube-auto-skip",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "build:filters": "node scripts/build-filters.mjs",
+    "check:package": "node scripts/check-package.mjs",
+    "build:release": "node scripts/build-release.mjs"
+  },
+  "devDependencies": {
+    "@adguard/dnr-converter": "2.0.0",
+    "@adguard/re2-wasm": "1.2.0"
+  },
+  "description": "Chrome MV3 general ad blocking and dedicated YouTube ad prevention and skipping.",
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stpcoder/youtube-auto-skip.git"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

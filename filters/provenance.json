@@ -1,0 +1,30 @@
+{
+  "builtAt": "2026-10-07T18:38:12.627Z",
+  "sources": [
+    {
+      "name": "YousList",
+      "url": "https://raw.githubusercontent.com/yous/YousList/master/youslist.txt",
+      "license": "CC-BY-4.0",
+      "attribution": "YousList contributors",
+      "homepage": "https://github.com/yous/YousList",
+      "sha256": "4fc86b0e1547cb7b8db56eca3c44c7b2633955e22584185193a153ad354ced5f"
+    },
+    {
+      "name": "EasyList",
+      "url": "https://easylist.to/easylist/easylist.txt",
+      "license": "CC-BY-SA-3.0",
+      "attribution": "EasyList authors",
+      "homepage": "https://github.com/easylist/easylist",
+      "sha256": "199b6069a9b73d55e64f04ed1713e372b5dda586fbf453b0eb734dc6aeb5dd27"
+    }
+  ],
+  "networkRules": 29893,
+  "cosmeticRules": 30236,
+  "popupHosts": 46469,
+  "conversionErrors": 72,
+  "limitations": [
+    "After conversion, too many declarative rules remain: 34688 exceeds the limit provided - 29900"
+  ],
+  "ignoredCosmetic": 40,
+  "note": "Not a full uBlock/AdGuard engine. Unsupported scriptlets, redirects, modifier rules and extended CSS are omitted. No tracking or cookie-consent filters are included."
+}

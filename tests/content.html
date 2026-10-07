@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<title>YouTube Auto Skip — 회귀 검증</title>
+<style>
+  body { font: 16px system-ui; margin: 32px; background: #f6f8fa; }
+  #movie_player { position: fixed; right: 40px; bottom: 40px; width: 300px; height: 120px; background: #222; padding: 20px; }
+  button { padding: 16px; }
+  li { margin: 12px 0; }
+  .pass { color: #126d39; } .fail { color: #b42318; }
+</style>
+<h1>YouTube 자동 건너뛰기 v2.6.1 회귀 검증</h1>
+<p>실제 Chromium DOM에서 감지 속도, 버튼 활성화, 좌표 재확인, 연속 광고를 검사합니다.</p>
+<p id="status">검사 중</p>
+<ol id="results"></ol>
+<div id="player"><div id="movie_player" class="html5-video-player ad-showing"></div></div>
+<script src="content-fixture.js"></script>
+<script src="../content.js"></script>
+</html>

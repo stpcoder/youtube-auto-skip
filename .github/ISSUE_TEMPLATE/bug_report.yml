@@ -1,0 +1,40 @@
+name: Problema / Bug report
+description: Anúncio, página quebrada ou falha de reprodução / Ads, broken pages or playback issues
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: "Português, English, Bahasa Indonesia e 한국어 são bem-vindos. Remova dados pessoais de imagens e logs."
+  - type: input
+    id: version
+    attributes:
+      label: Chrome e extensão / Chrome and extension versions
+      placeholder: "Chrome 154, extension 3.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área / Area
+      options:
+        - YouTube ads / anúncios
+        - YouTube startup / início da reprodução
+        - General site filtering / bloqueio geral
+        - Popup / janela de anúncio
+        - Translation / tradução
+        - Other / outro
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Como reproduzir / Steps to reproduce
+      description: "Inclua o site ou um vídeo público, configurações e outros bloqueadores ativos. Não inclua URLs privadas."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Esperado e observado / Expected and actual result
+    validations:
+      required: true

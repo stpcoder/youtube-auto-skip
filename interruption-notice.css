@@ -1,0 +1,6 @@
+/* Only renderers positively identified by interruption-notice.js are hidden. */
+yt-notification-action-renderer[data-youtube-auto-skip-interruption="true"],
+ytd-notification-action-renderer[data-youtube-auto-skip-interruption="true"],
+ytm-notification-action-renderer[data-youtube-auto-skip-interruption="true"] {
+  display: none !important;
+}

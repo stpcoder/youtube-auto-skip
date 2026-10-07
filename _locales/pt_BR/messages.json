@@ -1,0 +1,56 @@
+{
+  "extensionName": {
+    "message": "YouTube Auto Skip + Adblock"
+  },
+  "extensionDescription": {
+    "message": "Bloqueia anúncios e pop-ups, com prevenção e pulo automático de anúncios no YouTube e recuperação inicial limitada."
+  },
+  "actionTitle": {
+    "message": "Configurações do bloqueador"
+  },
+  "popupTitle": {
+    "message": "Bloqueio de anúncios"
+  },
+  "globalLabel": {
+    "message": "Bloqueio geral de anúncios"
+  },
+  "siteSection": {
+    "message": "Site atual"
+  },
+  "checkingSite": {
+    "message": "Verificando o site…"
+  },
+  "siteLabel": {
+    "message": "Bloquear neste site"
+  },
+  "loadingSettings": {
+    "message": "Carregando configurações…"
+  },
+  "youtubeHint": {
+    "message": "O pulo de anúncios e a ocultação do aviso de interrupção no YouTube funcionam separadamente do bloqueio geral."
+  },
+  "checkingFilters": {
+    "message": "Verificando filtros…"
+  },
+  "filterSource": {
+    "message": "Fontes dos filtros"
+  },
+  "rulesError": {
+    "message": "Não foi possível aplicar as regras: $1"
+  },
+  "refreshHint": {
+    "message": "Recarregue a página após alterar as configurações para aplicar as mudanças às novas solicitações."
+  },
+  "unsupportedPage": {
+    "message": "Indisponível nesta página."
+  },
+  "networkRules": {
+    "message": "$1 regras de rede"
+  },
+  "settingsError": {
+    "message": "Não foi possível ler as configurações: $1"
+  },
+  "parentPaused": {
+    "message": "O bloqueio está desativado em $1. Ative-o novamente nesse site principal."
+  }
+}
