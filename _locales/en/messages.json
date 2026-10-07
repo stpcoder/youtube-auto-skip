@@ -1,9 +1,9 @@
 {
   "extensionName": {
-    "message": "YouTube Auto Skip + Adblock"
+    "message": "AdBlock + YouTube"
   },
   "extensionDescription": {
-    "message": "Block general ads and ad popups, with dedicated YouTube ad prevention, automatic skipping and bounded startup recovery."
+    "message": "Block website ads and ad popups, with dedicated YouTube ad prevention, automatic skipping and bounded startup recovery."
   },
   "actionTitle": {
     "message": "Ad blocking settings"
@@ -39,7 +39,7 @@
     "message": "Could not apply rules: $1"
   },
   "refreshHint": {
-    "message": "Reload the page after changing settings to apply them to new requests."
+    "message": "Reload the page after changing settings."
   },
   "unsupportedPage": {
     "message": "Unavailable on this page."
@@ -52,5 +52,53 @@
   },
   "parentPaused": {
     "message": "Blocking is paused for $1. Re-enable it on that parent site."
+  },
+  "checkingVersion": {
+    "message": "Checking version"
+  },
+  "checkingPage": {
+    "message": "Checking page filters…"
+  },
+  "reloadPage": {
+    "message": "Reload this page"
+  },
+  "applyError": {
+    "message": "Could not apply settings: $1"
+  },
+  "webPageOnly": {
+    "message": "Available on regular web pages."
+  },
+  "youtubePage": {
+    "message": "YouTube uses its separate ad-skipping features."
+  },
+  "siteOff": {
+    "message": "General ad blocking is off on this site."
+  },
+  "noFilterResponse": {
+    "message": "No filter response"
+  },
+  "pageFilterError": {
+    "message": "Page filter error: $1"
+  },
+  "siteOnly": {
+    "message": "Only ad slots are hidden. Network requests on this site are allowed."
+  },
+  "exceptionsApplied": {
+    "message": "Official filter exceptions applied · $1 cosmetic rules · Network and popup protection are separate."
+  },
+  "pageFiltersApplied": {
+    "message": "Cosmetic filters applied · $1 selectors"
+  },
+  "noPageRules": {
+    "message": "No cosmetic rules apply here. Network and popup protection run separately."
+  },
+  "filtersPreparing": {
+    "message": "Preparing page filters. Check again shortly."
+  },
+  "pageNeedsReload": {
+    "message": "New filters are not connected to this tab. Reload the page after updating the extension."
+  },
+  "pageReloaded": {
+    "message": "Page reloaded. Reopen the extension popup to check the filter status."
   }
 }

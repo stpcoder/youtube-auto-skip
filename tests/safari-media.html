@@ -1,0 +1,6 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Safari 재생 도구 로컬 모의 검사</title>
+<style>body{background:#f6f8fb;color:#182331;margin:0;font:15px/1.6 system-ui}main{max-width:800px;padding:24px;margin:auto}h1{font-size:24px}#movie_player{background:#172330;color:white;padding:20px}video{width:100%;height:180px}button{font:inherit;min-height:44px;margin:6px;padding:8px 12px}#summary{white-space:pre-wrap}footer{height:300px}</style>
+<main><h1>Safari 재생 도구</h1><p>로컬 모의 검사 · 실제 iPhone 재생 검증 아님</p><div id="movie_player"><video class="html5-main-video" controls></video><p>모의 YouTube 본영상</p></div>
+<p>영상 재생·PiP API는 모의합니다. 소리만 재생은 주소가 없으면 정상 영상에 영향을 주지 않아야 합니다.</p>
+<button id="refresh-stats">결과 확인</button><button id="reject-pip">PiP 거부 모드</button><button id="allow-pip">PiP 허용 모드</button><button id="show-skip">모바일 스킵 버튼 표시</button><button id="supply-audio">오디오 주소 제공 모의</button><button id="reject-audio">오디오 재생 거부 모의</button><button id="resume-video">영상 재개 모의</button><button id="next">다음 영상 모의</button><pre id="summary" role="status">준비 중…</pre><footer></footer></main>
+<script src="safari-media-fixture.js"></script><script src="../safari/extension/media-core.js"></script><script src="../safari/extension/controls.js"></script><script src="../safari/extension/mobile-skip.js"></script></html>

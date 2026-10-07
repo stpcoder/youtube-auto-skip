@@ -1,53 +1,43 @@
-# YouTube Auto Skip + Adblock
-
-**Chrome ad blocking with dedicated YouTube protection.**
-
-An open-source Manifest V3 extension combining bundled ad and popup filters with YouTube player-response ad prevention, automatic skipping and bounded startup recovery.
+# AdBlock + YouTube
 
 [Português (Brasil)](../README.md) · [Bahasa Indonesia](README.id.md) · [한국어](README.ko.md)
 
-## Install the preview
+Chrome MV3 general ad blocking, supported YouTube ad processing and automatic skipping. **Chrome 3.0.4 · desktop Chrome 111+ · preview release.**
 
-1. Download the ZIP from the [preview release](https://github.com/stpcoder/youtube-auto-skip/releases/tag/v3.0.0-preview.1) and extract `youtube-auto-skip`.
+## Install
+
+1. Download `youtube-auto-skip-chrome-3.0.4.zip` from the [release](https://github.com/stpcoder/youtube-auto-skip/releases/tag/v3.0.4-preview.1) and extract it.
 2. Open `chrome://extensions` and enable **Developer mode**.
-3. Choose **Load unpacked**, then select the extracted folder containing `manifest.json`.
-4. Check version **3.0.0** and reload existing pages, including YouTube.
-5. Use the extension popup to toggle general filtering or allow the current site.
+3. Choose **Load unpacked** and select the extracted `youtube-auto-skip` folder containing `manifest.json`.
+4. Open the extension button to check its version and settings.
 
-Requires desktop Chrome 111+. This package has no validated support for Firefox, Safari, iPhone or the YouTube app. It is not published in the Chrome Web Store. To update, replace the extracted files, reload the extension, then reload pages.
+No build or Node.js installation is needed. You can also use Code → Download ZIP or clone the repository and load its root. Keep the installed folder; after updating files, reload the extension and open pages. [Installation options](INSTALL.md)
 
-The general toggle and site exceptions apply to general filtering. YouTube protection remains separate. Disable the extension in `chrome://extensions` to stop every feature.
+## Features
 
-## Features and limits
+- EasyList/YousList network and visual filter snapshots, plus known advertising-popup protection.
+- Per-site pause, parent-domain exceptions and compatibility rules that preserve ordinary content.
+- Supported YouTube response processing, player skip attempts and skip-button assistance, independent of general-blocking switches.
+- Bounded initial empty-buffer recovery and hiding of a specific Korean interruption notice. Other playback errors remain visible.
+- Popup page-filter diagnostics and reload button. Chrome metadata/settings support Portuguese, English, Indonesian and Korean.
 
-- Bundled network filtering and cosmetic ad hiding based on EasyList and YousList.
-- Blocking of popup destinations on known ad-server hosts; general and per-site controls.
-- Ad-field removal on known YouTube player-response paths, followed by automatic skip and button fallbacks when needed.
-- One bounded attempt to recover an initial empty-buffer wait while preserving the starting position, with a possible restoration of the original request.
+Includes 29,894 network rules, 30,236 visual rules and 169 cosmetic-policy rules. Chrome limits and unsupported syntax reduce coverage. Advanced procedural filters/scriptlets and Brazilian/Indonesian regional lists are not included. Lists do not update automatically. Complete removal of every ad, changed YouTube responses, server-stitched ads or server-imposed waits is not guaranteed.
 
-**This is a preview.** Coverage depends on the site, ad format and YouTube changes. It does not guarantee complete ad removal or immediate playback, and it does not implement the full uBlock Origin or AdGuard engine. The specific interruption-notice filter currently matches the Korean YouTube message; translating the extension does not extend that matcher to other YouTube interface languages.
+## Safari and privacy
 
-The snapshot includes 29,893 network rules and 30,236 cosmetic filter entries. Unsupported rules and conversion limits are recorded in [`filters/provenance.json`](../filters/provenance.json). YousList is a Korean supplement; EasyList Portuguese and ABPindo are not bundled. Brazilian and Indonesian site coverage has not been validated separately.
+Safari 1.0.0 is a separate YouTube-only development port with PiP and conditional audio-only tools. Installing its source on iPhone requires Mac/Xcode and personal signing. Real-device PiP and locked-screen playback remain unverified. [Safari guide](SAFARI.en.md)
 
-## Permissions and privacy
+HTTP/HTTPS access supports general blocking. Chrome `debugger` permission enables skip-button input assistance and may display a browser control notification. Settings stay in local extension storage; the source contains no external browsing-history analytics endpoint. [Architecture and permissions](TECHNICAL.md)
 
-HTTP/HTTPS host access supports site filtering. `storage` keeps preferences locally, `scripting` inserts CSS, `declarativeNetRequest` filters requests and `webNavigation` handles ad popup tabs. `debugger` is reserved for the YouTube skip-button fallback and may cause Chrome to display a control notice.
-
-This release contains no telemetry to the maintainer. Filters are bundled and updated with a new extension release. Only the developer filter-build command downloads filter sources. See [third-party notices](../THIRD_PARTY_NOTICES.md).
-
-## Develop and contribute
+## Development
 
 ```sh
-git clone https://github.com/stpcoder/youtube-auto-skip.git
-cd youtube-auto-skip
 npm ci
-npm test
-npm run check:package
+npm run verify
 npm run build:release
+npm run preview
 ```
 
-Requires Node.js 22+. Existing bundled filters are sufficient to install. Rebuild the saved snapshots with `npm run build:filters -- --offline`; an online rebuild may change coverage.
+Use Node.js 22+. Rebuild general bundles after editing sources. `build:filters` refreshes lists; `build:filters -- --offline` uses recorded sources. ZIP generation requires no system ZIP tools or Xcode. [Validation](VALIDATION.md) · [Contributing](../CONTRIBUTING.md) · [Notices](../THIRD_PARTY_NOTICES.md)
 
-Tests check simulated scenarios and package integrity, not universal live YouTube effectiveness. See [technical notes](TECHNICAL.md) and [contributing](../CONTRIBUTING.md). Submit a [reproducible bug report](https://github.com/stpcoder/youtube-auto-skip/issues/new/choose); Portuguese, English, Indonesian and Korean reports are welcome.
-
-Project code: [GPL-3.0-only](../LICENSE). Filter data has separate [attribution and licensing](../THIRD_PARTY_NOTICES.md). Independent project, not affiliated with YouTube or Google.
+Project code: GPL-3.0-only. Included filters retain their licenses and attribution.

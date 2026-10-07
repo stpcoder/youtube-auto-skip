@@ -1,15 +1,20 @@
-# Publication validation — 2026-10-08
+# Validation — Chrome 3.0.4 / Safari 1.0.0
 
-Tested the public Chrome 3.0.0 snapshot in a disposable profile using Chromium / Chrome for Testing 153.0.8010.12. No existing user browser profile was used.
+Publication check: 2026-10-08. Tested in disposable profiles with Chromium / Chrome for Testing **153.0.8010.12**. No existing user browser profile was used.
 
-- Node fixtures: **130 passed, 0 failed**.
-- Browser DOM fixtures: **56 passed, 0 failed** (prevention 12, early skip 10, button fallback 10, buffering recovery 12, interruption notice 12).
-- Package checks passed: manifest references and worker imports, separate policy assets per execution world, four complete locale catalogs and substitution parameters, filter counts and original source SHA-256 hashes.
-- Installed-extension integration checks passed on a local HTTP fixture: the bundled DNR engine blocked a matching request with `ERR_BLOCKED_BY_CLIENT`; cosmetic filtering hid a known ad element while preserving normal content; a known ad popup was suppressed; turning general filtering off restored content; a site exception created the expected allow rule.
-- The popup rendered title, labels, accessibility text and dynamic counts for English, Brazilian Portuguese, Indonesian and Korean. Locale APIs were supplied with each bundled catalog for these renderer checks; this does not establish operating-system language selection behavior for every platform. The extension's native UI language in the test profile was Korean.
+| Check | Result |
+| --- | --- |
+| `npm run verify` | 177 Node tests passed; generated bundles, versions, assets, locale placeholders, filter counts/source hashes and documentation links checked. |
+| `npm run test:browser` | 87 local fixture checks passed across eight pages. |
+| Installed Chrome runtime | Static DNR request blocking, explicit ad-area hiding, normal-content preservation, local generic-hide exception and ad-popup blocking passed. |
+| Settings and exceptions | General disable restored hidden content; site pause produced a dynamic network allow rule. |
+| Popup | Four locales in light/dark themes; version/title/ARIA, real tab diagnostics, native storage toggles and page reload passed. Five simulated diagnostic responses were checked per locale. No horizontal overflow; content remained within Chrome popup height. |
+| Release package | Chrome runtime folder loaded independently of development files and passed the installed-browser checks. Both manifest asset graphs checked. |
 
-The Portuguese screenshot in `docs/assets/popup.pt-BR.png` comes from this local popup renderer test. It is not a live YouTube demonstration.
+Fixture totals: prevention 12, early skip 10, content fallback 10, buffer recovery 12, interruption notice 12, general filters 12, ad slots 12, Safari media tools 7. Safari checks use mocked media/PiP APIs; they are not device validation. The popup screenshot in the main README is an actual local extension render, not proof of live-site results.
 
-The installed integration checks found an initial cosmetic-policy initialization failure when the same file path was listed in both MAIN and ISOLATED content-script entries. The public package uses separate, identical policy assets and passed the follow-up installation check.
+`npm run build:release` creates separate Chrome 3.0.4 runtime and Safari 1.0.0 development ZIPs with license notices, tagged-source links and SHA-256 checksums. Repackaging the same files produces identical ZIP hashes even after Chrome creates its compiled `_metadata` cache; that cache is excluded. The GitHub workflow repeats verification, packaging and installed-browser checks on Linux. ZIP creation uses Node.js without a system ZIP utility or Xcode.
 
-No live YouTube account or regional website effectiveness test was performed for this public snapshot. Simulated fixtures and local integration checks do not prove all-ad coverage, server-wait removal, or Brazilian/Indonesian site coverage. Remaining development dependency advisories are described in [TECHNICAL.md](TECHNICAL.md).
+No live YouTube account or Brazilian/Indonesian website effectiveness test was performed in this publication work. These checks do not establish all-ad coverage, server-wait removal, native Safari PiP or locked-screen playback. The Safari download is development source, not a signed IPA. Chromium browsers other than Chrome and mobile Chrome are not validated here.
+
+The existing converter dependency tree reports six npm advisories (five moderate, one high). It is development tooling and is excluded as executable code from the extension packages; see [technical details](TECHNICAL.md). Review converter upgrades separately from this publication change.

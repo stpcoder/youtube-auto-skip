@@ -2,7 +2,7 @@
 const prefs={globalEnabled:true,disabledSites:[]}, changes=[];
 let nativeCalls=0, appliedStyle;
 window.open=()=>{nativeCalls++;return {testWindow:true}};
-window.chrome={storage:{local:{get:async defaults=>({...defaults,...prefs})},onChanged:{addListener:f=>changes.push(f)}},runtime:{
+window.chrome={storage:{local:{get:async defaults=>({...defaults,...prefs})},onChanged:{addListener:f=>changes.push(f)}},runtime:{id:'test-extension',onMessage:{addListener(){}},
   getURL:p=>'/'+p,
   sendMessage:async m=>{
     if(m.type==='YAS_FRAME_CONTEXT')return {host:location.hostname};
@@ -29,6 +29,13 @@ document.querySelector('#run').onclick=()=>{
   let prevented=false;const a=document.createElement('a');a.href='https://ad.ad4989.co.kr/a';a.target='_blank';document.body.append(a);
   prevented=!a.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));a.remove();expect('광고 새 창 링크 차단',prevented);
   expect('정상 로그인 링크 보존',document.getElementById('legit').getAttribute('target')==='_blank');
+  const status=JSON.parse(document.documentElement.dataset.yasGeneralStatus||'{}');
+  expect('공식 로컬 페이지 일반 숨김 예외 적용',status.ready&&status.genericAllowed===false&&status.matchedExceptions>0);
+  expect('일반 광고 클래스와 겹친 정상 콘텐츠 보존',visible('generic-exception'));
+  expect('일반 Google 광고 서버 팝업 차단',window.open('https://googleads.g.doubleclick.net/pagead')===null);
+  const late=document.createElement('div');late.id='enter_late';
+  const lateFrame=document.createElement('iframe');lateFrame.src='https://ad.ad4989.co.kr/late';lateFrame.setAttribute('sandbox','');late.append(lateFrame);document.body.append(late);
+  expect('늦게 삽입된 광고 영역도 공통 CSS로 숨김',getComputedStyle(late).display==='none');late.remove();
   document.getElementById('results').textContent=JSON.stringify({passed:checks.filter(c=>c.passed).length,total:checks.length,checks},null,2);
 };
 document.getElementById('results').textContent='필터 로딩 후 검사 실행을 눌러 주세요.';

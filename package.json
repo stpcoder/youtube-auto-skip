@@ -1,19 +1,26 @@
 {
-  "name": "youtube-auto-skip",
-  "version": "3.0.0",
+  "name": "adblock-youtube",
+  "version": "3.0.4",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.cjs",
     "build:filters": "node scripts/build-filters.mjs",
+    "build:general": "node scripts/build-general.mjs",
+    "build:safari": "node scripts/build-safari.mjs",
     "check:package": "node scripts/check-package.mjs",
-    "build:release": "node scripts/build-release.mjs"
+    "build:release": "node scripts/build-release.mjs",
+    "verify": "npm run build:general && npm test && npm run check:package",
+    "test:browser": "node scripts/test-browser.mjs",
+    "preview": "node scripts/preview.mjs",
+    "release:notes": "node scripts/release-notes.mjs"
   },
   "devDependencies": {
     "@adguard/dnr-converter": "2.0.0",
-    "@adguard/re2-wasm": "1.2.0"
+    "@adguard/re2-wasm": "1.2.0",
+    "fflate": "0.8.3",
+    "playwright": "1.64.0"
   },
-  "description": "Chrome MV3 general ad blocking and dedicated YouTube ad prevention and skipping.",
   "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
@@ -21,5 +28,6 @@
   },
   "engines": {
     "node": ">=22"
-  }
+  },
+  "description": "Chrome MV3 ad blocking and YouTube ad skipping with an experimental Safari port."
 }

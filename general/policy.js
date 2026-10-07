@@ -10,6 +10,9 @@
     try {
       const url = new URL(value, base);
       if (!supported(url)) return false;
+      // Match known advertising campaigns, preserving normal provider pages.
+      if (['pandalive.co.kr', 'www.pandalive.co.kr'].includes(url.hostname.toLowerCase()) &&
+          /^\/evt\/heye\d+(?:&|\/|$)/i.test(url.pathname)) return true;
       let host = url.hostname.toLowerCase();
       while (host.includes('.')) {
         if (hosts.has(host)) return true;
@@ -23,5 +26,22 @@
     return !domains.some(d => d.startsWith('~') && hostMatches(host, d.slice(1))) &&
       (!positive.length || positive.some(d => hostMatches(host, d)));
   }
-  globalThis[Symbol.for('yas.general.policy')] = Object.freeze({ hostMatches, enabled, adUrl, domainRule });
+  function cosmeticPolicy(href, rules) {
+    const result = { generic: true, specific: true, matched: 0 };
+    let url;
+    try { url = new URL(href); } catch { return result; }
+    if (!supported(url)) return result;
+    // Credentials are not part of a hostname anchor in filter syntax.
+    url.username = ''; url.password = '';
+    for (const rule of rules) {
+      if (!domainRule(url.hostname, rule.domains)) continue;
+      if (!new RegExp(rule.regex, rule.flags).test(url.href)) continue;
+      result.matched++;
+      if (rule.modes.includes('generic') || rule.modes.includes('all')) result.generic = false;
+      if (rule.modes.includes('specific') || rule.modes.includes('all')) result.specific = false;
+    }
+    return result;
+  }
+  // Standalone test export; production bundles embed the value lexically.
+  globalThis.__YAS_GENERAL_POLICY_V3__ = Object.freeze({ hostMatches, enabled, adUrl, domainRule, cosmeticPolicy });
 })();

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extensionName__",
-  "version": "3.0.0",
+  "version": "3.0.4",
   "minimum_chrome_version": "111",
   "description": "__MSG_extensionDescription__",
   "permissions": [
@@ -84,9 +84,7 @@
         "*://*.youtube-nocookie.com/*"
       ],
       "js": [
-        "general/rule-data.js",
-        "general/policy.js",
-        "general/popup-guard.js"
+        "general/main-bundle.js"
       ],
       "world": "MAIN",
       "all_frames": true,
@@ -103,8 +101,7 @@
         "*://*.youtube-nocookie.com/*"
       ],
       "js": [
-        "general/policy-isolated.js",
-        "general/cosmetic.js"
+        "general/content-bundle.js"
       ],
       "all_frames": true,
       "run_at": "document_start"

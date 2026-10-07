@@ -1,33 +1,81 @@
-# YouTube Auto Skip + Adblock
-
-일반 사이트 광고 차단과 YouTube 전용 광고 사전 처리·자동 건너뛰기를 함께 제공하는 Chrome Manifest V3 확장입니다. **3.0.0 공개 시험판**이며 모든 광고 차단이나 즉시 재생을 보장하지 않습니다.
+# AdBlock + YouTube
 
 [Português (Brasil)](../README.md) · [English](README.en.md) · [Bahasa Indonesia](README.id.md)
 
-## 설치
+일반 웹 광고 차단과 YouTube 광고 차단·자동 스킵을 함께 제공하는 Chrome 확장 프로그램입니다.
 
-1. [시험판 릴리스](https://github.com/stpcoder/youtube-auto-skip/releases/tag/v3.0.0-preview.1)의 ZIP을 내려받아 `youtube-auto-skip` 폴더를 풉니다.
-2. `chrome://extensions`에서 **개발자 모드**를 켭니다.
-3. **압축해제된 확장 프로그램을 로드합니다**에서 `manifest.json`이 있는 폴더를 선택합니다.
-4. 버전 **3.0.0**을 확인하고 YouTube를 포함한 기존 탭을 새로고침합니다.
-5. 확장 아이콘을 눌러 일반 광고 차단과 현재 사이트 예외를 설정합니다.
+현재 Chrome 버전: **3.0.4** · Chrome 111 이상
 
-데스크톱 Chrome 111 이상이 필요합니다. Chrome 웹 스토어에는 아직 등록하지 않았습니다. 이 공개 패키지는 Firefox·Safari·iPhone·YouTube 앱을 지원한다고 검증되지 않았습니다. 업데이트할 때 파일을 교체하고 확장과 웹페이지를 각각 새로고침합니다.
+## 주요 기능
 
-일반 차단 토글과 사이트 예외는 YouTube 전용 기능과 별개입니다. 모든 기능을 중단하려면 확장 관리 화면에서 확장을 끕니다.
+- **일반 광고 차단**: EasyList·YousList 기반의 광고 요청 차단과 배너 숨김.
+- **광고 팝업 차단**: 알려진 광고 주소를 여는 새 창과 광고 링크 처리.
+- **YouTube 광고 차단**: 플레이어 응답의 광고 정보 사전 처리, 광고 종료 시도와 스킵 버튼 자동 클릭.
+- **YouTube 재생 보조**: 초기 빈 버퍼 복구 시도와 끊김 안내 문구 숨김. 다른 재생 오류 알림은 유지합니다.
+- **사이트별 제어**: 일반 광고 차단 전체 또는 현재 사이트의 차단을 켜고 끌 수 있습니다.
 
-## 동작과 한계
+YouTube 특화 기능은 일반 사이트 차단 설정과 별도로 동작합니다.
 
-EasyList·YousList를 변환한 네트워크 규칙 29,893개와 화면 필터 항목 30,236개를 포함합니다. 알려진 광고 서버로 향하는 팝업을 막고, YouTube에서는 알려진 플레이어 응답의 광고 필드를 제거한 뒤 필요하면 JS 스킵·버튼 클릭으로 보완합니다. 초기 빈 버퍼에서는 원래 시작 위치를 유지하는 제한적 재생 복구를 시도합니다.
+## Chrome 설치
 
-지원하지 않는 필터와 변환 제한은 [`filters/provenance.json`](../filters/provenance.json)에 기록했습니다. 전체 uBlock Origin·AdGuard 엔진과 같은 지원 범위가 아닙니다. 브라질·인도네시아 지역 필터는 아직 추가하지 않았으며, 해당 지역 사이트의 별도 실사용 검증도 완료하지 않았습니다. 끊김 안내 숨김은 현재 한국어 YouTube 문구만 대상으로 합니다.
+1. [릴리스](https://github.com/stpcoder/youtube-auto-skip/releases/tag/v3.0.4-preview.1)의 `youtube-auto-skip-chrome-3.0.4.zip`을 받아 압축을 풉니다.
+2. Chrome의 `chrome://extensions`에서 **개발자 모드**를 켭니다.
+3. **압축해제된 확장 프로그램 로드**를 누르고 `manifest.json`이 있는 `youtube-auto-skip` 폴더를 선택합니다.
+4. 확장 버튼을 열어 일반 광고 차단 설정을 확인합니다.
 
-HTTP/HTTPS 사이트 권한은 일반 필터링에 사용합니다. 설정은 `storage`로 로컬에 보관하고, `scripting`으로 CSS를 적용하며, `declarativeNetRequest`와 `webNavigation`으로 광고 요청과 광고 팝업을 처리합니다. `debugger`는 YouTube 버튼 클릭 보완에만 사용하며 Chrome 제어 안내가 표시될 수 있습니다. 이 릴리스 코드에는 유지관리자에게 보내는 원격 통계 수집이 없습니다. 필터는 설치 패키지에 포함하고 새 릴리스로 갱신합니다.
+Node.js나 빌드는 설치에 필요하지 않습니다. GitHub의 Code → Download ZIP 또는 git clone으로 받은 저장소 루트도 직접 설치할 수 있습니다. [설치 선택지와 문제 해결](INSTALL.md)
 
-## 개발과 기여
+업데이트할 때는 기존에 설치한 폴더의 파일을 갱신하고 확장 관리 화면에서 이 확장을 새로고침한 뒤, 사용 중인 웹 페이지도 새로고침하세요. 기존 설정은 유지됩니다. 사이트 이용에 문제가 생기면 해당 사이트의 차단을 끌 수 있습니다.
 
-Node.js 22 이상에서 `npm ci`, `npm test`, `npm run check:package`, `npm run build:release`를 실행합니다. 설치에는 포함된 필터를 그대로 사용합니다. `npm run build:filters -- --offline`은 저장한 필터 소스를 변환하고, 온라인 빌드는 새 소스를 받아 차단 범위가 달라질 수 있습니다.
+## iPhone / Safari
 
-자동 테스트는 모의 동작과 패키지 무결성을 확인하며 전체 YouTube 실사용 성공률을 뜻하지 않습니다. [기술 문서](TECHNICAL.md)와 [기여 안내](../CONTRIBUTING.md)를 참고하고, [이슈](https://github.com/stpcoder/youtube-auto-skip/issues/new/choose)에 Chrome·확장 버전, 재현 순서와 관측 결과를 남겨 주세요.
+YouTube 전용 Safari 확장은 별도 **개발판**입니다. YouTube 광고 처리, PiP 진입, 조건부 오디오 전용 재생 도구를 포함합니다. iPhone에는 확장을 담는 iOS 앱을 서명·설치해야 합니다.
 
-코드는 [GPL-3.0-only](../LICENSE), 필터 데이터는 [별도 출처와 라이선스](../THIRD_PARTY_NOTICES.md)를 따릅니다. YouTube·Google과 관계없는 독립 프로젝트입니다.
+실제 iPhone의 PiP·홈 화면·잠금 화면 재생은 아직 검증하지 않았습니다. 오디오 전용 재생은 직접 재생 가능한 오디오 주소가 있는 영상에 한정됩니다. [설치 방법과 지원 범위](../safari/README.md)
+
+## 개발
+
+```sh
+npm ci
+npm run verify
+npm run build:release
+npm run preview
+```
+
+개발에는 Node.js 22 이상을 사용합니다. `build:release`는 Chrome 설치 ZIP과 Safari 개발 소스 ZIP, 체크섬을 생성하며 외부 ZIP 도구나 Xcode가 필요하지 않습니다.
+
+일반 광고 차단 소스를 변경하면 `build:general`로 Chrome에 포함되는 번들을 다시 생성합니다.
+
+```sh
+# 최신 필터 다운로드 및 변환
+npm run build:filters
+
+# 보관된 원본 필터로 재생성
+npm run build:filters -- --offline
+
+# Safari 개발판 생성
+npm run build:safari
+```
+
+필터 빌드에는 일반 번들 생성도 포함됩니다. 변경 사항 적용에는 확장과 웹 페이지의 새로고침이 필요합니다. 브라우저 재현 검사 방법은 [테스트 안내](../tests/README.md)를 참고하세요.
+
+## 저장소 구성
+
+- 루트의 JavaScript: YouTube 광고 처리·스킵·재생 보조와 Chrome 서비스 워커.
+- `general/`: 일반 광고 차단, 팝업 보호, 설정창, 호환성 규칙과 배포 번들.
+- `filters/`: 필터 원본, 변환 데이터와 출처·해시·지원 제한 기록.
+- `scripts/`: 필터 변환 및 Chrome/Safari 빌드 도구.
+- `tests/`: 자동 검사와 로컬 브라우저 재현 페이지.
+- `safari/`: YouTube 전용 Safari 확장 소스와 iPhone 설치 안내.
+
+## 지원 범위
+
+필터 목록과 지원하는 규칙에 기반해 동작하며 모든 사이트·광고를 완전히 차단하지는 않습니다. Chrome 규칙 한도에 따른 일부 생략이 있고, 고급 절차형 필터·스크립틀릿·일부 주소 조건은 지원하지 않습니다. 필터는 로컬 묶음으로 제공하며 자동 갱신하지 않습니다.
+
+YouTube 구현이나 서버 정책이 바뀌면 광고 처리와 복구가 동작하지 않을 수 있습니다. 끊김 안내 숨김은 버퍼링 해결과 별개이며, 서버의 초기 대기 제거를 보장하지 않습니다.
+
+일반 사이트 처리를 위해 HTTP/HTTPS 페이지 접근 권한을 사용합니다. `debugger` 권한은 YouTube 스킵 버튼의 보조 입력에 사용하며, 이 경로에서는 Chrome의 제어 알림이 표시될 수 있습니다. 방문 기록을 외부 분석 서버로 전송하는 코드는 포함하지 않습니다.
+
+## 출처와 라이선스
+
+[EasyList](https://github.com/easylist/easylist)와 [YousList](https://github.com/yous/YousList) 필터 데이터를 사용합니다. 외부 프로젝트의 전체 실행 엔진을 포함하는 것은 아닙니다. 원본·라이선스·변환 내역은 [외부 자료 고지](../THIRD_PARTY_NOTICES.md)와 `filters/provenance.json`에 보존합니다.

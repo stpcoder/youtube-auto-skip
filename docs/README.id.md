@@ -1,44 +1,43 @@
-# YouTube Auto Skip + Adblock
-
-**Pemblokir iklan Chrome dengan perlindungan khusus untuk YouTube.**
-
-Ekstensi sumber terbuka berbasis Manifest V3. Menggabungkan filter iklan dan pop-up dengan pencegahan iklan pada respons pemutar YouTube, pelewatan otomatis, dan upaya pemulihan pemutaran awal yang dibatasi.
+# AdBlock + YouTube
 
 [Português (Brasil)](../README.md) · [English](README.en.md) · [한국어](README.ko.md)
 
-## Pasang versi pratinjau
+Ekstensi Chrome MV3 untuk memblokir iklan situs web dan memproses serta melewati iklan YouTube yang didukung. **Chrome 3.0.4 · Chrome desktop 111+ · rilis pratinjau.**
 
-1. Unduh ZIP dari [halaman rilis](https://github.com/stpcoder/youtube-auto-skip/releases/tag/v3.0.0-preview.1) lalu ekstrak folder `youtube-auto-skip`.
+## Instalasi
+
+1. Unduh `youtube-auto-skip-chrome-3.0.4.zip` dari [halaman rilis](https://github.com/stpcoder/youtube-auto-skip/releases/tag/v3.0.4-preview.1), lalu ekstrak.
 2. Buka `chrome://extensions` dan aktifkan **Mode developer**.
-3. Pilih **Muat yang belum dikemas**, lalu pilih folder hasil ekstraksi yang berisi `manifest.json`.
-4. Pastikan versi **3.0.0**, lalu muat ulang halaman yang sudah terbuka, termasuk YouTube.
-5. Gunakan popup ekstensi untuk mengatur pemblokiran umum atau mengizinkan situs saat ini.
+3. Pilih **Muat yang belum dipaketkan / Load unpacked**, lalu pilih folder `youtube-auto-skip` yang berisi `manifest.json`.
+4. Buka tombol ekstensi untuk memeriksa versi dan pengaturan.
 
-Memerlukan Chrome 111+ di komputer. Belum tersedia di Chrome Web Store. Paket ini belum memiliki dukungan tervalidasi untuk Firefox, Safari, iPhone, atau aplikasi YouTube. Untuk memperbarui, ganti berkas hasil ekstraksi, muat ulang ekstensi, lalu muat ulang halaman.
+Tidak perlu memasang Node.js atau menjalankan build. Gunakan juga Code → Download ZIP atau clone repositori, lalu muat folder utamanya. Simpan folder instalasi. Saat memperbarui, ganti berkas dalam folder yang sama, muat ulang ekstensi, lalu halaman yang terbuka. [Pilihan instalasi (English)](INSTALL.md)
 
-Pengaturan pemblokiran umum dan pengecualian situs bekerja terpisah dari perlindungan YouTube. Untuk menghentikan semua fitur, nonaktifkan ekstensi di `chrome://extensions`.
+## Fitur
 
-## Fitur dan batasan
+- Aturan jaringan dan visual dari snapshot EasyList/YousList serta perlindungan popup iklan yang dikenal.
+- Jeda per situs, pengecualian domain induk dan aturan kompatibilitas untuk menjaga konten biasa.
+- Pemrosesan respons YouTube, upaya melewati iklan dan bantuan tombol lewati; berjalan terpisah dari pemblokiran umum.
+- Pemulihan buffer kosong awal yang terbatas dan penyembunyian pesan gangguan tertentu dalam bahasa Korea. Kesalahan lainnya tetap terlihat.
+- Status filter halaman dan tombol muat ulang. Pengaturan Chrome tersedia dalam bahasa Portugis, Inggris, Indonesia dan Korea.
 
-- Filter jaringan dan penyembunyian elemen iklan berbasis EasyList dan YousList.
-- Pemblokiran pop-up yang menuju server iklan yang dikenal.
-- Penghapusan kolom iklan pada respons pemutar YouTube yang dikenali, dengan pelewatan otomatis dan klik tombol sebagai cadangan.
-- Upaya terbatas untuk memulihkan buffer kosong saat awal pemutaran, dengan posisi awal video tetap dipertahankan.
+Memuat 29.894 aturan jaringan, 30.236 aturan visual dan 169 aturan kebijakan filter visual. Batas Chrome dan sintaks yang belum didukung mengurangi cakupan. Filter regional Indonesia/Brasil belum disertakan dan daftar tidak diperbarui otomatis. Tidak semua iklan atau waktu tunggu YouTube dapat dihilangkan.
 
-**Ini versi pratinjau.** Hasil bergantung pada situs, format iklan, dan perubahan YouTube. Tidak menjamin semua iklan terblokir atau video langsung diputar. Mesin filter tidak mencakup semua kemampuan uBlock Origin atau AdGuard. Penyembunyian notifikasi gangguan saat ini hanya mengenali pesan YouTube dalam bahasa Korea.
+## Safari dan privasi
 
-Paket memuat 29.893 aturan jaringan dan 30.236 entri filter tampilan. Batas konversi dicatat di [`filters/provenance.json`](../filters/provenance.json). YousList merupakan tambahan untuk situs Korea; ABPindo dan EasyList Portuguese belum disertakan. Cakupan situs Indonesia belum diuji secara khusus.
+Safari 1.0.0 adalah port pengembangan khusus YouTube dengan alat PiP dan audio saja bersyarat. Instalasi iPhone memerlukan Mac, Xcode dan penandatanganan sendiri. PiP dan pemutaran saat layar terkunci pada perangkat nyata belum diverifikasi. [Panduan Safari (English)](SAFARI.en.md)
 
-## Izin dan data
+Akses HTTP/HTTPS dipakai untuk pemblokiran umum. Izin `debugger` mendukung input tombol lewati YouTube dan dapat memunculkan pemberitahuan kontrol browser. Pengaturan disimpan lokal; kode tidak mengirim riwayat penjelajahan ke endpoint analitik eksternal.
 
-Akses situs HTTP/HTTPS diperlukan untuk pemfilteran. `storage` menyimpan preferensi lokal, `scripting` menerapkan CSS, `declarativeNetRequest` memfilter permintaan, dan `webNavigation` menangani tab pop-up iklan. `debugger` digunakan sebagai cadangan untuk mengklik tombol lewati iklan YouTube dan dapat menampilkan pemberitahuan Chrome.
+## Pengembangan
 
-Kode rilis ini tidak mengirim telemetri kepada pengelola. Filter disertakan dalam paket dan diperbarui melalui rilis baru. Perintah pembangunan filter untuk pengembang mengunduh sumber filter.
+```sh
+npm ci
+npm run verify
+npm run build:release
+npm run preview
+```
 
-## Pengembangan dan kontribusi
+Gunakan Node.js 22+. Bangun ulang bundle umum setelah mengubah sumbernya. Paket ZIP dibuat tanpa utilitas ZIP sistem atau Xcode. [Validasi](VALIDATION.md) · [Teknis](TECHNICAL.md) · [Kontribusi](../CONTRIBUTING.md) · [Atribusi](../THIRD_PARTY_NOTICES.md)
 
-Gunakan Node.js 22+, jalankan `npm ci`, `npm test`, `npm run check:package`, dan `npm run build:release`. Filter sudah disertakan untuk pemasangan. Pengujian memeriksa skenario simulasi dan integritas paket, bukan keberhasilan pemblokiran iklan YouTube secara universal.
-
-Baca [catatan teknis](TECHNICAL.md) dan [panduan kontribusi](../CONTRIBUTING.md). Kirim [laporan yang dapat direproduksi](https://github.com/stpcoder/youtube-auto-skip/issues/new/choose) dalam bahasa Indonesia, Portugis, Inggris, atau Korea.
-
-Kode proyek: [GPL-3.0-only](../LICENSE). Filter mengikuti [lisensi dan atribusi masing-masing](../THIRD_PARTY_NOTICES.md). Proyek independen, tidak berafiliasi dengan YouTube atau Google.
+Kode proyek: GPL-3.0-only. Filter mempertahankan lisensi dan atribusinya masing-masing.

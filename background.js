@@ -1,7 +1,7 @@
 "use strict";
 
 // General filtering is independent of the existing YouTube debugger fallback.
-if (typeof importScripts === "function") importScripts("general/background.js");
+if (typeof importScripts === "function") importScripts("general/worker-bundle.js");
 
 const PROTOCOL_VERSION = "1.3";
 const activeClicks = new Map();

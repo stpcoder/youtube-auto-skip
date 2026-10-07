@@ -1,0 +1,19 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; frame-src 'none'">
+<title>광고 영역과 정상 콘텐츠 보존 검사</title>
+<style>body{margin:0;background:#f6f8fb;color:#182331;font:16px/1.6 system-ui}main{max-width:960px;margin:auto;padding:24px}h1{font-size:25px}.normal{border:1px solid #dce3eb;padding:16px;background:white;margin:16px 0}.sample{padding:10px;background:#efcece;margin:8px 0}button{font:inherit;min-height:44px;padding:10px;margin:6px}pre{white-space:pre-wrap}.post-media{height:80px;background:#e6edf4;padding:20px}</style>
+<main><h1>광고 영역과 정상 콘텐츠 보존 검사</h1><p>배너·플로팅 광고와 정상 본문을 구분하는 호환성 규칙을 검사합니다. 외부 광고·사진은 불러오지 않습니다.</p>
+<div id="top_right" class="normal"><div class="banner-wrap" data-position="top_right" data-type="fix">사이트 헤더 일러스트 · 보존</div></div>
+<nav id="navigation" class="normal">정상 메뉴와 로그인 <a href="/pstation/index.html">포인트 충전 링크</a></nav>
+<div id="main_left_top"><div class="banner-wrap sample" data-position="main_left_top" data-type="fix"><a href="/pstation/index.html">포인트 충전 홍보 배너</a></div></div>
+<div id="board_detail_top"><div class="banner-wrap sample" data-position="board_detail_top" data-type="fix"><a href="https://www.pandalive.co.kr/evt/heye06">본문 상단 광고</a></div></div>
+<article id="post" class="normal"><h2>정상 게시글</h2><p>본문·이미지·영상과 메뉴의 너비를 변경하지 않습니다.</p><div class="post-media">정상 게시글 미디어 자리</div></article>
+<div id="board_detail"><div class="banner-wrap sample" data-position="board_detail" data-type="random">본문 하단 홍보 배너</div></div>
+<div id="board_ad"><div class="banner-wrap sample" data-position="board_ad" data-type="random"><a href="https://www.pandalive.co.kr/evt/heye08">목록 상단 광고</a></div></div>
+<div id="site_left"><div class="banner-wrap sample" data-position="site_left" data-type="fix">왼쪽 광고</div></div>
+<div id="site_right_banner_item"><div id="site_right2"><div class="banner-wrap sample" data-position="site_right2" data-type="random">오른쪽 고정 홍보</div></div></div>
+<div class="toast-banner"><button>광고 닫기</button><div id="toast"><div class="banner-wrap sample" data-position="toast" data-type="random">우하단 광고</div></div></div>
+<div class="floating-banner"><div class="banner-wrap sample" data-position="floating_mtop" data-type="fix">모바일 상단 광고</div></div>
+<div id="normal-notice" class="normal">정상 공지 · 보존</div>
+<button id="run">검사 실행</button><button id="pause">차단 끄기</button><button id="resume">차단 켜기</button><pre id="results" role="status">준비 중…</pre></main>
+<script src="../general/policy.js"></script><script src="../general/site-rules.js"></script><script src="ad-slots-fixture.js"></script></html>

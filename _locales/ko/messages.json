@@ -1,9 +1,9 @@
 {
   "extensionName": {
-    "message": "YouTube Auto Skip + Adblock"
+    "message": "AdBlock + YouTube"
   },
   "extensionDescription": {
-    "message": "일반 광고·광고 팝업 차단과 YouTube 광고 사전 처리·자동 건너뛰기·제한적인 초기 재생 복구를 제공합니다."
+    "message": "일반 웹 광고·광고 팝업 차단과 YouTube 광고 차단·자동 스킵·제한적인 초기 재생 복구를 제공합니다."
   },
   "actionTitle": {
     "message": "광고 차단 설정"
@@ -36,10 +36,10 @@
     "message": "필터 출처"
   },
   "rulesError": {
-    "message": "규칙 적용 실패: $1"
+    "message": "네트워크 규칙 오류: $1"
   },
   "refreshHint": {
-    "message": "변경 후 페이지를 새로고침하면 새 요청에도 적용됩니다."
+    "message": "설정 변경 후 페이지를 새로고침해 주세요."
   },
   "unsupportedPage": {
     "message": "이 페이지에서는 사용할 수 없습니다."
@@ -52,5 +52,53 @@
   },
   "parentPaused": {
     "message": "$1에서 차단을 꺼 둔 상태입니다. 해당 사이트에서 다시 켤 수 있습니다."
+  },
+  "checkingVersion": {
+    "message": "버전 확인 중"
+  },
+  "checkingPage": {
+    "message": "이 페이지의 필터를 확인하고 있습니다."
+  },
+  "reloadPage": {
+    "message": "현재 페이지 새로고침"
+  },
+  "applyError": {
+    "message": "설정을 적용하지 못했습니다: $1"
+  },
+  "webPageOnly": {
+    "message": "일반 웹 페이지에서 사용할 수 있습니다."
+  },
+  "youtubePage": {
+    "message": "YouTube는 별도의 광고 스킵 기능으로 처리합니다."
+  },
+  "siteOff": {
+    "message": "이 사이트의 일반 광고 차단이 꺼져 있습니다."
+  },
+  "noFilterResponse": {
+    "message": "필터 응답 없음"
+  },
+  "pageFilterError": {
+    "message": "페이지 필터 오류: $1"
+  },
+  "siteOnly": {
+    "message": "광고 영역만 숨김 · 이 사이트의 네트워크 요청은 허용합니다."
+  },
+  "exceptionsApplied": {
+    "message": "공식 필터 예외 적용 · 화면 규칙 $1개 · 네트워크·팝업 보호는 별도"
+  },
+  "pageFiltersApplied": {
+    "message": "페이지 화면 필터 적용됨 · $1개 선택자"
+  },
+  "noPageRules": {
+    "message": "이 페이지에 적용할 화면 규칙이 없습니다. 네트워크·팝업 보호는 별도로 동작합니다."
+  },
+  "filtersPreparing": {
+    "message": "페이지 필터를 준비하고 있습니다. 잠시 후 다시 확인해 주세요."
+  },
+  "pageNeedsReload": {
+    "message": "이 탭에 새 필터가 연결되지 않았습니다. 확장 업데이트 후 페이지를 새로고침해 주세요."
+  },
+  "pageReloaded": {
+    "message": "페이지를 새로고침했습니다. 확장 창을 다시 열어 적용 상태를 확인하세요."
   }
 }

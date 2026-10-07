@@ -1,6 +1,6 @@
 {
   "extensionName": {
-    "message": "YouTube Auto Skip + Adblock"
+    "message": "AdBlock + YouTube"
   },
   "extensionDescription": {
     "message": "Bloqueia anúncios e pop-ups, com prevenção e pulo automático de anúncios no YouTube e recuperação inicial limitada."
@@ -39,7 +39,7 @@
     "message": "Não foi possível aplicar as regras: $1"
   },
   "refreshHint": {
-    "message": "Recarregue a página após alterar as configurações para aplicar as mudanças às novas solicitações."
+    "message": "Recarregue a página após alterar as configurações."
   },
   "unsupportedPage": {
     "message": "Indisponível nesta página."
@@ -52,5 +52,53 @@
   },
   "parentPaused": {
     "message": "O bloqueio está desativado em $1. Ative-o novamente nesse site principal."
+  },
+  "checkingVersion": {
+    "message": "Verificando versão"
+  },
+  "checkingPage": {
+    "message": "Verificando filtros da página…"
+  },
+  "reloadPage": {
+    "message": "Recarregar esta página"
+  },
+  "applyError": {
+    "message": "Não foi possível aplicar as configurações: $1"
+  },
+  "webPageOnly": {
+    "message": "Disponível em páginas da web."
+  },
+  "youtubePage": {
+    "message": "O YouTube usa suas funções separadas de pulo de anúncios."
+  },
+  "siteOff": {
+    "message": "O bloqueio geral está desativado neste site."
+  },
+  "noFilterResponse": {
+    "message": "Sem resposta do filtro"
+  },
+  "pageFilterError": {
+    "message": "Erro no filtro da página: $1"
+  },
+  "siteOnly": {
+    "message": "Apenas áreas de anúncios são ocultadas. As solicitações de rede deste site são permitidas."
+  },
+  "exceptionsApplied": {
+    "message": "Exceções oficiais aplicadas · $1 regras visuais · A proteção de rede e de pop-ups funciona separadamente."
+  },
+  "pageFiltersApplied": {
+    "message": "Filtros visuais aplicados · $1 seletores"
+  },
+  "noPageRules": {
+    "message": "Nenhuma regra visual se aplica aqui. A proteção de rede e de pop-ups funciona separadamente."
+  },
+  "filtersPreparing": {
+    "message": "Preparando os filtros da página. Verifique novamente em breve."
+  },
+  "pageNeedsReload": {
+    "message": "Os novos filtros ainda não estão conectados a esta aba. Recarregue a página após atualizar a extensão."
+  },
+  "pageReloaded": {
+    "message": "Página recarregada. Abra novamente a extensão para verificar o estado dos filtros."
   }
 }

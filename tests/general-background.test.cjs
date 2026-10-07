@@ -16,7 +16,7 @@ function harness(prefs={},getSource=async()=>({url:'https://news.example.org/art
     tabs:{get:getSource,remove:async id=>removed.push(id),onRemoved:event('removed')},
     webNavigation:{onCreatedNavigationTarget:event('created'),onBeforeNavigate:event('before'),onCommitted:event('committed')}};
   c.importScripts=(...files)=>{for(const f of files) vm.runInContext(read(f),c);};
-  vm.runInContext(read('general/background.js'),c);
+  vm.runInContext(read('general/worker-bundle.js'),c);
   return {listeners,removed,css,updates,toggles,errors,prefs};
 }
 test('paused sites add allow rules without removing unrelated dynamic rules',async()=>{
@@ -68,4 +68,11 @@ test('a legitimate commit during delayed source lookup cancels popup tracking',a
   resolveSource({url:'https://news.example.org/article'});await created;
   h.listeners.before({tabId:5,frameId:0,url:'https://ad.ad4989.co.kr/a'});await tick();
   assert.equal(h.removed.length,0);
+});
+test('worker closes a known campaign popup but preserves the main site and normal destination',async()=>{
+  const h=harness({},async()=>({url:'https://heye.kr/board/index.html'}));await tick();
+  await h.listeners.created({sourceTabId:1,tabId:6,url:'https://www.pandalive.co.kr/evt/heye01&5&iframe'});
+  assert.deepEqual(h.removed,[6]);
+  await h.listeners.created({sourceTabId:1,tabId:7,url:'https://www.pandalive.co.kr/play/pandacp'});
+  assert.deepEqual(h.removed,[6]);
 });

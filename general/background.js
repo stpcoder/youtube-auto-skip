@@ -1,9 +1,9 @@
 'use strict';
 importScripts('general/rule-data.js', 'general/policy.js');
-const generalPolicy = globalThis[Symbol.for('yas.general.policy')];
-const popupAdHosts = new Set(globalThis[Symbol.for('yas.general.data')].popupHosts);
+const generalPolicy = globalThis.__YAS_GENERAL_POLICY_V3__;
+const popupAdHosts = new Set(globalThis.__YAS_GENERAL_DATA_V3__.popupHosts);
 const createdPopupTabs = new Map();
-let generalSettings = {}, generalSync = Promise.resolve();
+let generalSettings = { globalEnabled: false, disabledSites: [] }, generalSync = Promise.resolve();
 
 function syncGeneralRules() {
   generalSync = generalSync.catch(() => {}).then(async () => {

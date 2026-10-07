@@ -1,0 +1,17 @@
+[
+  {
+    "domains": ["heye.kr"],
+    "networkExempt": true,
+    "cosmeticOnly": true,
+    "selectors": [
+      ".banner-wrap[data-position=\"board_detail_top\"][data-type]",
+      ".banner-wrap[data-position=\"board_detail\"][data-type]",
+      "#site_left:has(> .banner-wrap[data-position=\"site_left\"])",
+      "#site_right_banner_item:has(.banner-wrap[data-position^=\"site_right\"])",
+      ".toast-banner:has(.banner-wrap[data-position=\"toast\"])",
+      ".floating-banner:has(.banner-wrap[data-position^=\"floating_\"])",
+      ".banner-wrap[data-position=\"main_left_top\"]:has(a[href=\"/pstation/index.html\"])",
+      ".banner-wrap[data-position=\"board_ad\"]:has(a[href^=\"https://www.pandalive.co.kr/evt/\"])"
+    ]
+  }
+]

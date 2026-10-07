@@ -137,7 +137,7 @@ test("ignores disconnected notifications", () => {
 test("manifest installs cosmetic files separately from MAIN playback recovery", () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, "../manifest.json"), "utf8"));
   const isolated = manifest.content_scripts.find(s => s.js.includes("interruption-notice.js"));
-  assert.equal(manifest.version, "3.0.0");
+  assert.equal(manifest.version, "3.0.4");
   assert.equal(isolated.world, undefined);
   assert.equal(isolated.run_at, "document_start");
   assert.ok(isolated.css.includes("interruption-notice.css"));

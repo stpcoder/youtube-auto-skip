@@ -1,2 +1,39 @@
-:root{color-scheme:light dark;--bg:#f6f8fb;--surface:#fff;--text:#182331;--muted:#536275;--line:#dce3eb;--accent:#08769b}
-*{box-sizing:border-box}body{margin:0;width:340px;background:var(--bg);color:var(--text);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}main{padding:20px}header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}h1{font-size:21px;margin:0;line-height:1.3}header span{color:var(--muted)}.setting{display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:48px;font-weight:600}input{width:22px;height:22px;accent-color:var(--accent);cursor:pointer}input:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:4px}section{border-top:1px solid var(--line);margin-top:14px;padding-top:14px}#host{margin:0;color:var(--muted);overflow-wrap:anywhere;font-size:14px}#status,.hint{font-size:14px}#status{color:var(--accent);min-height:42px}.hint{color:var(--muted)}footer{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:12px;font-size:12px;color:var(--muted)}a{color:var(--accent)}@media(prefers-color-scheme:dark){:root{--bg:#141c25;--surface:#1d2834;--text:#ecf3fa;--muted:#b0c0d0;--line:#334353;--accent:#58c8ed}}@media(max-width:339px){body{width:100vw}main{padding:16px}}
+:root {
+  color-scheme: light dark;
+  --bg: #f6f8fb;
+  --text: #182331;
+  --muted: #536275;
+  --line: #dce3eb;
+  --accent: #08769b;
+  --danger: #a12d27;
+  font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+}
+* { box-sizing: border-box; }
+/* Native Chrome actions start with an intrinsic viewport. A vw-based fallback
+   can shrink the content to match its own initially tiny viewport. */
+html, body { margin: 0; width: 400px; min-width: 400px; }
+body { background: var(--bg); color: var(--text); word-break: keep-all; }
+main { padding: 20px; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+h1 { font-size: 21px; line-height: 1.3; margin: 0; }
+header span { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.setting { display: grid; grid-template-columns: minmax(0, 1fr) 24px; align-items: center; gap: 16px; min-height: 48px; font-weight: 600; cursor: pointer; }
+input { margin: 0; width: 22px; height: 22px; accent-color: var(--accent); cursor: pointer; }
+input:disabled { cursor: default; }
+input:focus-visible, a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+section { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 14px; }
+#host { margin: 0; color: var(--muted); overflow-wrap: anywhere; font-size: 14px; }
+#status, .hint, #page-state { font-size: 14px; margin: 12px 0; overflow-wrap: break-word; }
+#status { color: var(--muted); }
+#page-state { color: var(--accent); }
+#page-state[data-error="true"] { color: var(--danger); }
+.hint { color: var(--muted); }
+button { min-height: 40px; width: 100%; font: inherit; border: 1px solid var(--line); border-radius: 7px; padding: 8px 12px; color: var(--text); background: transparent; cursor: pointer; }
+button:hover { border-color: var(--accent); }
+button:disabled { color: var(--muted); cursor: default; opacity: .65; }
+footer { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 12px; border-top: 1px solid var(--line); margin-top: 16px; padding-top: 12px; font-size: 13px; color: var(--muted); }
+footer a { white-space: nowrap; }
+a { color: var(--accent); }
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #141c25; --text: #ecf3fa; --muted: #b0c0d0; --line: #334353; --accent: #58c8ed; --danger: #ffb8af; }
+}

@@ -3,3 +3,5 @@ filters/sources/*.txt -whitespace
 # Filter snapshots and generated datasets are not the extension's source language.
 filters/** linguist-vendored
 general/rule-data.js linguist-generated
+general/*-bundle.js linguist-generated
+general/site-rules.js linguist-generated

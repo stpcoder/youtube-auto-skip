@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { Filter, FilterConverter } from '@adguard/dnr-converter';
+import { parseCosmeticException } from './cosmetic-filter-parser.mjs';
 
 // Maintained filter data only. Never download or execute remote scriptlets.
 const root = new URL('../', import.meta.url);
@@ -9,7 +10,7 @@ const sources = [
   { name: 'EasyList', url: 'https://easylist.to/easylist/easylist.txt', license: 'CC-BY-SA-3.0', attribution: 'EasyList authors', homepage: 'https://github.com/easylist/easylist' },
 ];
 const offline = process.argv.includes('--offline');
-const filters = [], cosmetic = [], popupHosts = new Set(['ad.ad4989.co.kr', 'adexpert.ad4989.co.kr']);
+const filters = [], cosmetic = [], cosmeticPolicies = [], unsupportedCosmeticPolicies = [], popupHosts = new Set(['ad.ad4989.co.kr', 'adexpert.ad4989.co.kr']);
 let ignoredCosmetic = 0;
 await mkdir(new URL('filters/sources/', root), { recursive: true });
 for (const [index, source] of sources.entries()) {
@@ -27,6 +28,12 @@ for (const [index, source] of sources.entries()) {
   const network = [];
   for (const line of text.split(/\r?\n/)) {
     if (!line || line.startsWith('!') || line.startsWith('[')) continue;
+    const hidePolicy = parseCosmeticException(line);
+    if (hidePolicy) {
+      if (hidePolicy.unsupported) unsupportedCosmeticPolicies.push({ source: source.name, ...hidePolicy });
+      else cosmeticPolicies.push(hidePolicy);
+      continue; // Cosmetic policy is not a network allow rule.
+    }
     const c = line.match(/^([^#]*)(#@#|##)(.+)$/);
     if (c) {
       const [, domains, kind, selector] = c;
@@ -48,10 +55,12 @@ const [{ ruleset, errors, limitations }] = await new FilterConverter().convert(f
   combine: true, maxNumberOfRules: 29900, maxNumberOfRegexpRules: 900, maxNumberOfUnsafeRules: 0,
 });
 const youtube = ['youtube.com', 'youtube-nocookie.com'];
+const siteRules = JSON.parse(await readFile(new URL('general/site-rules.json', root), 'utf8'));
+const cosmeticOnlyDomains = siteRules.filter(r => r.networkExempt).flatMap(r => r.domains);
 const rules = ruleset.getDeclarativeRules().filter(r => ['block', 'allow', 'allowAllRequests'].includes(r.action.type));
 for (const r of rules) {
   // Leave YouTube requests to the existing purpose-built prevention/skip logic.
-  r.condition.excludedInitiatorDomains = [...new Set([...(r.condition.excludedInitiatorDomains || []), ...youtube])];
+  r.condition.excludedInitiatorDomains = [...new Set([...(r.condition.excludedInitiatorDomains || []), ...youtube, ...cosmeticOnlyDomains])];
   // General network rules do not replace or break direct user navigation.
   if (r.action.type === 'block') {
     r.condition.excludedResourceTypes = [...new Set([...(r.condition.excludedResourceTypes || []), 'main_frame'])];
@@ -65,15 +74,26 @@ const usable = rules.filter(r => !r.condition.resourceTypes || r.condition.resou
 // Keep the supplied ad iframe covered even if the general conversion is capped.
 usable.push({ id: 900001, priority: 100, action: { type: 'block' }, condition: {
   requestDomains: ['ad.ad4989.co.kr','adexpert.ad4989.co.kr'],
-  excludedInitiatorDomains: youtube, resourceTypes: ['sub_frame','script','image','xmlhttprequest'],
+  excludedInitiatorDomains: [...youtube, ...cosmeticOnlyDomains], resourceTypes: ['sub_frame','script','image','xmlhttprequest'],
 } });
+// This frame-level exception also permits nested third-party frame resources.
+// The site stays reachable; its known ad slots are handled cosmetically only.
+if (cosmeticOnlyDomains.length) usable.push({ id: 900002, priority: 100000,
+  action: { type: 'allowAllRequests' }, condition: {
+    requestDomains: cosmeticOnlyDomains, resourceTypes: ['main_frame', 'sub_frame'],
+    excludedInitiatorDomains: youtube,
+  }
+});
 const data = { popupHosts: [...popupHosts].sort(), cosmetic };
 await writeFile(new URL('filters/network.json', root), JSON.stringify(usable));
 await writeFile(new URL('filters/cosmetic.json', root), JSON.stringify(cosmetic));
-await writeFile(new URL('general/rule-data.js', root), `// Generated from attributed filter snapshots; no remote executable code.\n(() => { globalThis[Symbol.for("yas.general.data")] = ${JSON.stringify({ popupHosts: data.popupHosts })}; })();\n`);
+await writeFile(new URL('filters/cosmetic-policy.json', root), JSON.stringify(cosmeticPolicies));
+await writeFile(new URL('general/rule-data.js', root), `// Generated from attributed filter snapshots; no remote executable code.\n(() => { globalThis.__YAS_GENERAL_DATA_V3__ = ${JSON.stringify({ popupHosts: data.popupHosts })}; })();\n`);
 const provenance = { builtAt: new Date().toISOString(), sources, networkRules: usable.length,
   cosmeticRules: cosmetic.length, popupHosts: popupHosts.size, conversionErrors: errors.length,
+  cosmeticPolicyRules: cosmeticPolicies.length, unsupportedCosmeticPolicies,
   limitations: limitations.map(e => String(e.message || e)), ignoredCosmetic,
-  note: 'Not a full uBlock/AdGuard engine. Unsupported scriptlets, redirects, modifier rules and extended CSS are omitted. No tracking or cookie-consent filters are included.' };
+  note: 'Not a full uBlock/AdGuard engine. Cosmetic generichide/elemhide/specifichide exceptions are compiled separately. Unsupported scriptlets, redirects, other modifier rules and extended CSS are omitted. No tracking or cookie-consent filters are included.' };
 await writeFile(new URL('filters/provenance.json', root), JSON.stringify(provenance, null, 2) + '\n');
 console.log(JSON.stringify(provenance, null, 2));
+await import('./build-general.mjs');

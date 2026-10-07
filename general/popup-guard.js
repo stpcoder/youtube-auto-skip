@@ -2,10 +2,11 @@
   'use strict';
   const key = Symbol.for('yas.general.popup');
   if (window[key]) return;
-  const policy = window[Symbol.for('yas.general.policy')];
-  const hosts = new Set(window[Symbol.for('yas.general.data')].popupHosts);
+  const policy = globalThis.__YAS_GENERAL_POLICY_V3__;
+  const hosts = new Set(globalThis.__YAS_GENERAL_DATA_V3__.popupHosts);
   const nativeOpen = window.open;
-  const stats = { version: '3.0.0', blockedOpen: 0, blockedLinks: 0, enabled: true };
+  // Wait for the isolated script's preferences; a paused site must stay paused during startup.
+  const stats = { version: '3.0.4', blockedOpen: 0, blockedLinks: 0, enabled: false };
   window[key] = stats;
   const publish = () => { if (document.documentElement) document.documentElement.dataset.yasPopupStatus = JSON.stringify(stats); };
   window.addEventListener('message', e => {

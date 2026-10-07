@@ -1,6 +1,6 @@
 {
   "extensionName": {
-    "message": "YouTube Auto Skip + Adblock"
+    "message": "AdBlock + YouTube"
   },
   "extensionDescription": {
     "message": "Blokir iklan dan pop-up, cegah dan lewati iklan YouTube secara otomatis, serta coba pulihkan pemutaran awal."
@@ -39,7 +39,7 @@
     "message": "Tidak dapat menerapkan aturan: $1"
   },
   "refreshHint": {
-    "message": "Muat ulang halaman setelah mengubah pengaturan agar perubahan berlaku pada permintaan baru."
+    "message": "Muat ulang halaman setelah mengubah pengaturan."
   },
   "unsupportedPage": {
     "message": "Tidak tersedia di halaman ini."
@@ -52,5 +52,53 @@
   },
   "parentPaused": {
     "message": "Pemblokiran dinonaktifkan untuk $1. Aktifkan kembali di situs induk tersebut."
+  },
+  "checkingVersion": {
+    "message": "Memeriksa versi"
+  },
+  "checkingPage": {
+    "message": "Memeriksa filter halaman…"
+  },
+  "reloadPage": {
+    "message": "Muat ulang halaman ini"
+  },
+  "applyError": {
+    "message": "Tidak dapat menerapkan pengaturan: $1"
+  },
+  "webPageOnly": {
+    "message": "Tersedia di halaman web biasa."
+  },
+  "youtubePage": {
+    "message": "YouTube menggunakan fitur pelewatan iklannya secara terpisah."
+  },
+  "siteOff": {
+    "message": "Pemblokiran iklan umum dinonaktifkan di situs ini."
+  },
+  "noFilterResponse": {
+    "message": "Tidak ada respons filter"
+  },
+  "pageFilterError": {
+    "message": "Kesalahan filter halaman: $1"
+  },
+  "siteOnly": {
+    "message": "Hanya area iklan yang disembunyikan. Permintaan jaringan situs ini diizinkan."
+  },
+  "exceptionsApplied": {
+    "message": "Pengecualian filter resmi diterapkan · $1 aturan tampilan · Perlindungan jaringan dan pop-up bekerja terpisah."
+  },
+  "pageFiltersApplied": {
+    "message": "Filter tampilan diterapkan · $1 selektor"
+  },
+  "noPageRules": {
+    "message": "Tidak ada aturan tampilan yang berlaku di sini. Perlindungan jaringan dan pop-up bekerja terpisah."
+  },
+  "filtersPreparing": {
+    "message": "Menyiapkan filter halaman. Periksa kembali sebentar lagi."
+  },
+  "pageNeedsReload": {
+    "message": "Filter baru belum terhubung ke tab ini. Muat ulang halaman setelah memperbarui ekstensi."
+  },
+  "pageReloaded": {
+    "message": "Halaman dimuat ulang. Buka kembali popup ekstensi untuk memeriksa status filter."
   }
 }

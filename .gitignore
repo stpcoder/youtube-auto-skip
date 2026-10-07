@@ -1,5 +1,11 @@
 node_modules/
 build/
-.DS_Store
-*.log
 _metadata/
+.DS_Store
+safari/xcode/
+safari/xcode-v1/
+tests/*-observation*.json
+tests/*-validation-*.json
+tests/*.jpg
+tests/*.png
+*.log

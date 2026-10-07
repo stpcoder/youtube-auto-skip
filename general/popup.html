@@ -5,13 +5,15 @@
 <title>Ad blocking settings</title>
 <link rel="stylesheet" href="popup.css">
 <main>
-  <header><h1 data-i18n="popupTitle">Ad blocking</h1><span>3.0</span></header>
+  <header><h1 data-i18n="popupTitle">Ad blocking</h1><span id="version" data-i18n="checkingVersion">Checking version</span></header>
   <label class="setting"><span data-i18n="globalLabel">General ad blocking</span><input id="enabled" type="checkbox" role="switch"></label>
   <section aria-label="Current site" data-i18n-aria="siteSection">
     <p id="host" data-i18n="checkingSite">Checking site…</p>
     <label class="setting"><span data-i18n="siteLabel">Block on this site</span><input id="site-enabled" type="checkbox" role="switch"></label>
   </section>
   <p id="status" role="status" data-i18n="loadingSettings">Loading settings…</p>
+  <p id="page-state" role="status" data-i18n="checkingPage">Checking page filters…</p>
+  <button id="reload-page" type="button" disabled data-i18n="reloadPage">Reload this page</button>
   <p class="hint" data-i18n="youtubeHint">YouTube ad skipping and interruption-notice hiding run independently of general blocking settings.</p>
   <footer><span id="rules" data-i18n="checkingFilters">Checking filters…</span><a href="https://github.com/stpcoder/youtube-auto-skip/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener" data-i18n="filterSource">Filter sources</a></footer>
 </main>
