@@ -1,0 +1,5 @@
+# Preserve source snapshots byte-for-byte; their whitespace belongs upstream.
+filters/sources/*.txt -whitespace
+# Filter snapshots and generated datasets are not the extension's source language.
+filters/** linguist-vendored
+general/rule-data.js linguist-generated
