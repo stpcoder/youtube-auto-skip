@@ -35,7 +35,7 @@ Os filtros incluem **29.894 regras de rede**, **30.236 entradas visuais** e **16
 
 ## Safari / iPhone
 
-O repositório inclui uma extensão YouTube para Safari **1.0.0 em desenvolvimento**, com tentativas de PiP e áudio direto quando disponível. O ZIP Safari contém fontes, não um aplicativo iOS assinado. A instalação exige Mac, Xcode e assinatura própria. PiP e reprodução com a tela bloqueada ainda não foram validados em iPhone real. [Preparar o projeto](docs/SAFARI.en.md) · [Guia em coreano](safari/README.md).
+O código Safari **1.1.1 em desenvolvimento** inclui filtros gerais compartilhados com Chrome, ferramentas de PiP e reprodução em segundo plano condicional mantendo o vídeo original. O ZIP público anterior 1.0.0 não contém essas mudanças. O ZIP Safari contém fontes, não um aplicativo iOS assinado. A instalação exige Mac, Xcode e assinatura própria. PiP e reprodução com a tela bloqueada ainda não foram validados em iPhone real. [Preparar o projeto](docs/SAFARI.en.md) · [Guia em coreano](safari/README.md).
 
 ## Permissões e dados
 

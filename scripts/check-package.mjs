@@ -35,11 +35,15 @@ export async function checkPackage(root = repositoryRoot) {
     if (sha256(bytes) !== source.sha256) throw Error(`Filter source hash mismatch: ${source.name}`);
   }
   const safari = await readJSON(resolve(root, 'safari/extension/manifest.json'));
-  const safariOwn = ['manifest.json', 'background.js', 'bootstrap.js', 'media-core.js', 'controls.js', 'mobile-skip.js'];
+  const safariOwn = ['manifest.json', 'background.js', 'bootstrap.js', 'media-core.js', 'controls.js', 'mobile-skip.js', 'general-bootstrap.js', 'popup.html', 'popup.js', 'popup.css'];
   const safariShared = ['anti-adblock.js', 'prevention.js', 'buffering-recovery.js', 'early.js', 'interruption-notice.js', 'interruption-notice.css'];
   for (const file of safariOwn) await access(resolve(root, 'safari/extension', file));
+  for (const file of ['icons/focus-48.png', 'icons/focus-128.png']) await access(resolve(root, 'safari/extension', file));
+  for (const file of ['Package.swift', 'host/FocusSetupViewController.swift', 'host/Resources/focus-icon.png', 'integration/SafariWebExtensionHandler.swift']) await access(resolve(root, 'safari', file));
   for (const file of safariShared) await access(resolve(root, file));
-  if (safari.permissions.includes('debugger') || safari.host_permissions.some(host => !host.includes('youtube.com'))) throw Error('Safari must remain YouTube-only');
+  const startup = safari.content_scripts.filter(entry => entry.world === 'MAIN');
+  if (safari.permissions.includes('debugger') || startup.length !== 1 || startup[0].run_at !== 'document_start' || startup[0].js.join(',') !== 'youtube-main.js' || startup[0].matches.some(match => !/^https:\/\/(?:www\.|m\.)?youtube\.com\/\*$/.test(match))) throw Error('Safari requires its scoped declarative MAIN startup without Chrome debugger');
+  if (safari.declarative_net_request.rule_resources[0].path !== 'network.json') throw Error('Safari general filters are missing');
   const markdownFiles = [resolve(root, 'README.md'), resolve(root, 'CONTRIBUTING.md'), ...await walk(resolve(root, 'docs')), ...await walk(resolve(root, 'safari'))].filter(path => path.endsWith('.md') && !path.includes('/xcode'));
   for (const path of markdownFiles) {
     const source = await readFile(path, 'utf8');

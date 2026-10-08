@@ -8,10 +8,12 @@
     "build:filters": "node scripts/build-filters.mjs",
     "build:general": "node scripts/build-general.mjs",
     "build:safari": "node scripts/build-safari.mjs",
+    "export:focus": "npm run build:general && node scripts/build-safari.mjs --integration",
     "check:package": "node scripts/check-package.mjs",
     "build:release": "node scripts/build-release.mjs",
     "verify": "npm run build:general && npm test && npm run check:package",
     "test:browser": "node scripts/test-browser.mjs",
+    "test:focus": "node scripts/test-focus.mjs",
     "preview": "node scripts/preview.mjs",
     "release:notes": "node scripts/release-notes.mjs"
   },

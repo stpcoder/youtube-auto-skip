@@ -4,6 +4,7 @@ _metadata/
 .DS_Store
 safari/xcode/
 safari/xcode-v1/
+safari/.build/
 tests/*-observation*.json
 tests/*-validation-*.json
 tests/*.jpg

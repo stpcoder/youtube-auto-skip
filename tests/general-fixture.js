@@ -23,6 +23,8 @@ document.querySelector('#run').onclick=()=>{
   const visible=id=>getComputedStyle(document.getElementById(id)).display!=='none';
   expect('제공된 고정 광고 숨김',!visible('exact-banner'));
   expect('제공된 광고 iframe 껍데기 숨김',!visible('enter_0Gm0'));
+  expect('주소 없는 광고 SDK iframe 영역 숨김',!visible('ts_ms_fixture'));
+  expect('정상 주소 없는 iframe 영역 보존',visible('normal-empty-frame'));
   expect('정상 본문 보존',visible('normal'));expect('정상 공지 배너 보존',visible('normal-banner'));
   expect('광고 window.open 차단',window.open('https://ad.ad4989.co.kr/a')===null);
   expect('정상 새 창 반환 보존',window.open('https://accounts.example.org/login')?.testWindow===true);

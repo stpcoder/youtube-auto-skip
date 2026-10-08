@@ -25,7 +25,7 @@ Memuat 29.894 aturan jaringan, 30.236 aturan visual dan 169 aturan kebijakan fil
 
 ## Safari dan privasi
 
-Safari 1.0.0 adalah port pengembangan khusus YouTube dengan alat PiP dan audio saja bersyarat. Instalasi iPhone memerlukan Mac, Xcode dan penandatanganan sendiri. PiP dan pemutaran saat layar terkunci pada perangkat nyata belum diverifikasi. [Panduan Safari (English)](SAFARI.en.md)
+Kode sumber Safari 1.1.1 adalah port pengembangan dengan filter iklan umum bersama Chrome, PiP dan alat pemutaran latar belakang bersyarat yang mempertahankan video asli. ZIP publik sebelumnya 1.0.0 belum memuat perubahan ini. Instalasi iPhone memerlukan Mac, Xcode dan penandatanganan sendiri. PiP dan pemutaran saat layar terkunci pada perangkat nyata belum diverifikasi. [Panduan Safari (English)](SAFARI.en.md)
 
 Akses HTTP/HTTPS dipakai untuk pemblokiran umum. Izin `debugger` mendukung input tombol lewati YouTube dan dapat memunculkan pemberitahuan kontrol browser. Pengaturan disimpan lokal; kode tidak mengirim riwayat penjelajahan ke endpoint analitik eksternal.
 

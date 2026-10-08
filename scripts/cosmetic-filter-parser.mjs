@@ -6,7 +6,7 @@ const modes = new Map([
   ['elemhide', 'all'], ['ehide', 'all'],
 ]);
 const separator = '(?:[^A-Za-z0-9_%.-]|$)';
-function urlPattern(pattern) {
+export function urlPattern(pattern) {
   if (pattern.startsWith('/') && pattern.endsWith('/')) throw Error('regular-expression exception');
   let prefix = '', suffix = '';
   if (pattern.startsWith('||')) {

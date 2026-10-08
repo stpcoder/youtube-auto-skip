@@ -55,7 +55,7 @@
   check("no reload after playback", loads.length === 1);
   check("native request serialization restored", w.JSON.parse(w.JSON.stringify(original)).context.client.clientScreen === "WATCH");
   check("one transform per retry", w.youtubeAutoSkipBufferingRecovery.getStats().requestTransforms === 1);
-  check("recovery status visible in DOM", JSON.parse(d.documentElement.dataset.youtubeAutoSkipRecoveryStatus).version === "2.6.1");
+  check("recovery status visible in DOM", JSON.parse(d.documentElement.dataset.youtubeAutoSkipRecoveryStatus).version === "2.7.0");
   window.fixtureResults = results;
   document.getElementById("result").textContent = `${results.filter(r => r.passed).length}/${results.length} 통과\n` + results.map(r => `${r.passed ? "PASS" : "FAIL"} ${r.name}`).join("\n");
 })().catch(error => { document.getElementById("result").textContent = `FAIL ${error.stack}`; });

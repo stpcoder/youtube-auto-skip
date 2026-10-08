@@ -1,0 +1,10 @@
+Built-in image_gen generation, 2026-10-08. Original image retained in the generation workspace; packaged copies are mechanically downscaled, not redrawn.
+
+Use case: logo-brand
+Asset type: production iPhone app icon for Focus, square 1024 x 1024
+Primary request: a very cute original character logo with a minimal hand-drawn sketch sensibility, clean and calm.
+Subject: one tiny round sitting kitten, softly pointed ears, simple dot eyes and a tiny relaxed smile, a friendly compact silhouette.
+Style/medium: clean black ink doodle, gently imperfect confident sketch lines, white character fill. Extremely simple and legible at small app-icon sizes.
+Composition/framing: single centered character occupying about 65 percent of the square, balanced open margins, plain pure-white edge-to-edge background. The operating system will round the icon, so no drawn tile border or rounded-square frame.
+Color palette: black and pure white only.
+Constraints: no text or letters, no YouTube symbols, no shield or blocked-ad symbols, no props, no additional characters, no gradients, no shadows, no textured background, no watermark, no device mockup. Friendly, adorable, understated, original.

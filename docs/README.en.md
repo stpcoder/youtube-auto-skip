@@ -25,7 +25,7 @@ Includes 29,894 network rules, 30,236 visual rules and 169 cosmetic-policy rules
 
 ## Safari and privacy
 
-Safari 1.0.0 is a separate YouTube-only development port with PiP and conditional audio-only tools. Installing its source on iPhone requires Mac/Xcode and personal signing. Real-device PiP and locked-screen playback remain unverified. [Safari guide](SAFARI.en.md)
+Safari source 1.1.1 is a separate development port with shared general ad filters, PiP and original-video conditional background-playback tools. The previous public 1.0.0 ZIP does not include these changes. Installing its source on iPhone requires Mac/Xcode and personal signing. Real-device PiP and locked-screen playback remain unverified. [Safari guide](SAFARI.en.md)
 
 HTTP/HTTPS access supports general blocking. Chrome `debugger` permission enables skip-button input assistance and may display a browser control notification. Settings stay in local extension storage; the source contains no external browsing-history analytics endpoint. [Architecture and permissions](TECHNICAL.md)
 

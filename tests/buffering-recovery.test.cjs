@@ -6,7 +6,7 @@ const path = require("node:path");
 const source = fs.readFileSync(path.join(__dirname, "../buffering-recovery.js"), "utf8");
 
 function harness(before = "") {
-  const context = vm.createContext({ URL, console });
+  const context = vm.createContext({ URL, console, Request, Response, Headers, AbortController, Blob, CompressionStream, DecompressionStream });
   vm.runInContext(`
     window = globalThis;
     now = 0; Date.now = () => 1700000000000 + now;
@@ -84,6 +84,166 @@ test("missing notice uses only sustained strict initial empty-buffer fallback", 
   h.run("tick(1)");
   assert.equal(h.run("reloads.length"), 1);
   assert.equal(h.run("stats().lastTrigger"), "sustained-initial-empty-buffer");
+});
+
+test('Safari mobile opt-in applies one bounded recovery to MWEB without changing the client identity', () => {
+  const h = harness(`window[Symbol.for('youtube-auto-skip.recovery-options')]={mobile:true};
+    location.href='https://m.youtube.com/watch?v=content';
+    const originalRequest=request;request=()=>{const r=originalRequest();r.context.client.clientName='MWEB';return r;};`);
+  h.run('tick(1800)');
+  assert.equal(h.run('reloads.length'),1);
+  assert.equal(h.run('requests[0].params'),'eAFgAQ');
+  assert.equal(h.run('requests[0].context.client.clientName'),'MWEB');
+  h.run('notice();tick(1250);notice();tick(1250)');
+  assert.equal(h.run('reloads.length'),2);
+  assert.equal(h.run('requests[1].params'),undefined);
+});
+test('desktop recovery keeps mobile disabled unless explicitly enabled', () => {
+  const h=harness("location.href='https://m.youtube.com/watch?v=content'");
+  h.run('tick(5000)');assert.equal(h.run('reloads.length'),0);
+});
+
+const immediateMobile = `window[Symbol.for('youtube-auto-skip.recovery-options')]={mobile:true,immediate:true};
+  location.href='https://m.youtube.com/watch?v=content';navigator={userAgent:'Mozilla/5.0 (iPhone) Safari/1'};`;
+
+test('Safari tags the first request before the player exists and never duplicates that request', () => {
+  const h=harness(immediateMobile+"document.getElementById=()=>null;");
+  h.run("body=request();body.context.client.clientName='MWEB';delete body.attestationRequest;delete body.context.client.userAgent;delete body.playbackContext.contentPlaybackContext.referer;sent=JSON.parse(JSON.stringify(body))");
+  assert.equal(h.run('sent.params'),'eAFgAQ');
+  assert.equal(h.run('sent.context.client.clientName'),'MWEB');
+  assert.equal(h.run('sent.context.client.userAgent'),'Mozilla/5.0 (iPhone; eafg) Safari/1');
+  assert.equal(h.run('stats().upfrontRequests'),1);assert.equal(h.run('stats().firstRequestAtMs'),0);
+  assert.equal(h.run('reloads.length'),0);assert.equal(h.run('body.params'),undefined);
+  h.run("document.getElementById=id=>id==='movie_player'?player:null;tick(100)");
+  assert.equal(h.run('reloads.length'),0);
+  h.run('video.readyState=4;video.buffered.length=1;state=1;videoListeners.playing()');
+  assert.equal(h.run('stats().stage'),'playback-observed-after-initial-request');
+  assert.equal(h.run('JSON.parse(JSON.stringify(request())).params'),undefined);
+});
+
+test('Safari immediately re-requests an embedded initial response without desktop buffer statistics', () => {
+  const h=harness(immediateMobile+"delete player.getStatsForNerds;state=-1;response.playerConfig.playbackStartConfig.startSeconds=42;");
+  assert.deepEqual(h.json('reloads'),[['content',42]]);
+  assert.equal(h.run('requests[0].params'),'eAFgAQ');
+  assert.equal(h.run('stats().initialReloads'),1);assert.equal(h.run('stats().attemptToPlayingMs'),null);
+  h.run('tick(100);tick(100);tick(100)');assert.equal(h.run('reloads.length'),1);
+});
+
+test('Safari restores one original request if immediate startup stays empty without an error message', () => {
+  const h=harness(immediateMobile);
+  h.run('tick(12000);notice();tick(20000)');
+  assert.equal(h.run('reloads.length'),2);assert.equal(h.run('stats().originalReloads'),1);
+  assert.equal(h.run('requests[1].params'),undefined);assert.equal(h.run('stats().stage'),'expired-restored');
+});
+
+test('immediate startup never resets decoded content or an explicitly paused/live video', () => {
+  for(const change of ['video.readyState=4;video.buffered.length=1;state=1','state=2;video.paused=true','response.videoDetails.isLive=true']) {
+    const h=harness(immediateMobile+change);
+    assert.equal(h.run('reloads.length'),0);
+    assert.equal(h.run('JSON.parse(JSON.stringify(request())).params'),undefined);
+  }
+});
+
+const mobileTransport = immediateMobile+`document.getElementById=()=>null;cachedStringify=JSON.stringify;fetches=[];
+  fetch=function(input,init){fetches.push({input,init});return 'native-fetch-result';};
+  XMLHttpRequest=class {open(...args){this.openArgs=args;}send(body){this.sent=body;}};`;
+
+test('Safari tags the actual player fetch even with cached serialization and omitted playback fields', () => {
+  const h=harness(mobileTransport);
+  h.run("body={videoId:'content',context:{client:{clientName:'MWEB',clientVersion:'keep'}}};init={method:'POST',body:cachedStringify(body),headers:{keep:true},signal:{keep:true}};result=fetch('/youtubei/v1/player?prettyPrint=false',init);sent=JSON.parse(fetches[0].init.body)");
+  assert.equal(h.run('result'),'native-fetch-result');assert.equal(h.run('fetches.length'),1);
+  assert.equal(h.run('sent.params'),'eAFgAQ');assert.equal(h.run('sent.context.client.clientName'),'MWEB');
+  assert.equal(h.run('sent.context.client.clientVersion'),'keep');
+  assert.equal(h.run('fetches[0].init.headers===init.headers&&fetches[0].init.signal===init.signal'),true);
+  assert.equal(h.run('body.params'),undefined);assert.equal(h.run('stats().transportTransforms'),1);
+  assert.equal(h.run('stats().eafgRequests'),1);
+});
+
+test('an already tagged serialized request is passed to native fetch once without rewriting it twice', () => {
+  const h=harness(mobileTransport);
+  h.run("init={method:'POST',body:JSON.stringify(request())};fetch('/youtubei/v1/player',init)");
+  assert.equal(h.run('fetches.length'),1);assert.equal(h.run('fetches[0].init===init'),true);
+  assert.equal(h.run('stats().requestTransforms'),1);assert.equal(h.run('stats().transportTransforms'),0);
+  assert.equal(h.run('stats().eafgRequests'),1);
+});
+
+test('Safari supports streamed get_watch envelopes and preserves native XHR semantics', () => {
+  const h=harness(mobileTransport);
+  h.run("body={context:{client:{clientName:'MWEB'}},playerRequest:{videoId:'content'},unrelated:{keep:true}};xhr=new XMLHttpRequest();xhr.open('POST','/youtubei/v1/get_watch',false);xhr.send(cachedStringify(body));sent=JSON.parse(xhr.sent)");
+  assert.equal(h.run('sent.playerRequest.params'),'eAFgAQ');
+  assert.equal(h.run('sent.context.client.clientName'),'MWEB');assert.equal(h.run("'context' in sent.playerRequest"),false);
+  assert.equal(h.run('sent.unrelated.keep'),true);assert.deepEqual(h.json('xhr.openArgs'),['POST','/youtubei/v1/get_watch',false]);
+  assert.equal(h.run('stats().eafgRequests'),1);assert.equal(h.run('reloads.length'),0);
+  h.run("xhr.open('POST','https://foreign.example/youtubei/v1/player');xhr.send(cachedStringify(body))");
+  assert.equal(h.run('JSON.parse(xhr.sent).playerRequest.params'),undefined);
+  h.run("xhr.open('POST','/youtubei/v1/player');xhr.send('{broken')");assert.equal(h.run('xhr.sent'),'{broken');
+});
+
+test('Safari tags a new SPA request while navigation is pending instead of waiting for the response', () => {
+  const h=harness(mobileTransport);
+  h.run("listeners['yt-navigate-start']();location.href='https://m.youtube.com/watch?v=next';body=request();body.videoId='next';sent=JSON.parse(JSON.stringify(body));response.videoDetails.videoId='next';document.getElementById=id=>id==='movie_player'?player:null;listeners['yt-navigate-finish']();drain()");
+  assert.equal(h.run('sent.params'),'eAFgAQ');assert.equal(h.run('reloads.length'),0);
+  assert.equal(h.run('stats().sessions'),1);
+});
+
+test('Safari transforms a native Request body before the SPA address changes, preserving native options and signal', async () => {
+  const h=harness(mobileTransport+"location.href='https://m.youtube.com/';");
+  h.run("controller=new AbortController();body={context:{client:{clientName:'MWEB'}},playerRequest:{videoId:'next'},nextRequest:{videoId:'next'}};input=new Request('https://m.youtube.com/youtubei/v1/get_watch',{method:'POST',body:cachedStringify(body),headers:{'Content-Type':'application/json','X-Test':'keep'},signal:controller.signal});init={credentials:'include'}");
+  assert.equal(await h.run('fetch(input,init)'),'native-fetch-result');
+  assert.equal(h.run('fetches.length'),1);assert.equal(h.run('input.bodyUsed'),false);
+  h.run('sent=JSON.parse(fetches[0].init.body);effective=new Request(fetches[0].input,fetches[0].init)');
+  assert.equal(h.run('sent.playerRequest.params'),'eAFgAQ');assert.equal(h.run("'context' in sent.playerRequest"),false);
+  assert.equal(h.run('sent.nextRequest.videoId'),'next');assert.equal(h.run('effective.credentials'),'include');
+  assert.equal(h.run("effective.headers.get('X-Test')"),'keep');
+  assert.equal(h.run("effective.headers.get('Content-Type')"),'application/json');
+  h.run('controller.abort()');assert.equal(h.run('effective.signal.aborted'),true);
+  assert.equal(h.run('stats().eafgRequests'),1);assert.equal(h.run('stats().transportTransforms'),1);
+  h.run("location.href='https://m.youtube.com/watch?v=next';response.videoDetails.videoId='next';document.getElementById=id=>id==='movie_player'?player:null;listeners['yt-navigate-finish']();drain()");
+  assert.equal(h.run('reloads.length'),0);assert.equal(h.run('stats().sessions'),1);
+});
+
+test('native Request inspection leaves tagged and malformed bodies unchanged and never reads unrelated endpoints', async () => {
+  const h=harness(mobileTransport);
+  h.run("input=new Request('https://m.youtube.com/youtubei/v1/player',{method:'POST',body:JSON.stringify(request())})");
+  await h.run('fetch(input)');
+  assert.equal(h.run('fetches[0].input===input&&fetches[0].init===undefined'),true);
+  assert.equal(h.run('stats().transportTransforms'),0);assert.equal(h.run('stats().eafgRequests'),1);
+  h.run("broken=new Request('https://m.youtube.com/youtubei/v1/player',{method:'POST',body:'{broken'})");
+  await h.run('fetch(broken)');assert.equal(h.run('fetches[1].input===broken&&fetches[1].init===undefined'),true);
+  h.run("foreign=new Request('https://foreign.example/youtubei/v1/player',{method:'POST',body:'{}'});foreign.clone=()=>{throw Error('must not inspect')}");
+  assert.equal(h.run('fetch(foreign)'),'native-fetch-result');assert.equal(h.run('fetches.length'),3);
+  assert.equal(h.run('foreign.bodyUsed'),false);
+});
+
+test('URL input and Request inspection failure delegate exactly once with the original fetch options', async () => {
+  const h=harness(mobileTransport);
+  h.run("inputURL=new URL('https://m.youtube.com/youtubei/v1/player');fetch(inputURL,{method:'POST',body:cachedStringify(request())});sent=JSON.parse(fetches[0].init.body)");
+  assert.equal(h.run('sent.params'),'eAFgAQ');
+  h.run("input=new Request(inputURL,{method:'POST',body:'{}'});input.clone=()=>({text:()=>Promise.reject(Error('unavailable'))});init={cache:'no-store'}");
+  assert.equal(await h.run('fetch(input,init)'),'native-fetch-result');
+  assert.equal(h.run('fetches.length'),2);assert.equal(h.run('fetches[1].input===input&&fetches[1].init===init'),true);
+});
+
+test('gzip-compressed native MWEB requests are transformed before navigation and retain encoding, headers and watch-next data', async () => {
+  const h=harness(mobileTransport+"location.href='https://m.youtube.com/';");
+  await h.run("(async()=>{body={context:{client:{clientName:'MWEB'}},playerRequest:{videoId:'next',startTimeSecs:42},watchNextRequest:{videoId:'next',params:'keep'}};compressed=await new Response(new Blob([cachedStringify(body)]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer();input=new Request('https://m.youtube.com/youtubei/v1/get_watch',{method:'POST',headers:{'Content-Encoding':'gzip','Content-Type':'application/json','X-Test':'keep'},body:compressed});return fetch(input)})()");
+  assert.equal(h.run('fetches.length'),1);assert.equal(h.run('input.bodyUsed'),false);
+  await h.run("(async()=>{effective=new Request(fetches[0].input,fetches[0].init);sent=JSON.parse(await new Response(effective.body.pipeThrough(new DecompressionStream('gzip'))).text())})()");
+  assert.equal(h.run("effective.headers.get('Content-Encoding')"),'gzip');
+  assert.equal(h.run("effective.headers.get('X-Test')"),'keep');
+  assert.equal(h.run('sent.playerRequest.params'),'eAFgAQ');assert.equal(h.run('sent.playerRequest.startTimeSecs'),42);
+  assert.equal(h.run('sent.watchNextRequest.params'),'keep');assert.equal(h.run('stats().compressedRequests'),1);
+  assert.equal(h.run('stats().eafgRequests'),1);assert.equal(h.run('stats().transportTransforms'),1);
+  await h.run("(async()=>{taggedBytes=await new Response(new Blob([cachedStringify(sent)]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer();tagged=new Request(input.url,{method:'POST',headers:input.headers,body:taggedBytes});return fetch(tagged)})()");
+  assert.equal(h.run('fetches.length'),2);assert.equal(h.run('fetches[1].input===tagged&&fetches[1].init===undefined'),true);
+  assert.equal(h.run('stats().transportTransforms'),1);assert.equal(h.run('stats().eafgRequests'),2);
+});
+
+test('a rejected native fetch is never repeated after Request inspection', async () => {
+  const h=harness(mobileTransport+"fetch=function(input,init){fetches.push({input,init});return Promise.reject(Error('network failure'))};");
+  h.run("input=new Request('https://m.youtube.com/youtubei/v1/player',{method:'POST',body:cachedStringify(request())})");
+  await assert.rejects(h.run('fetch(input)'),/network failure/);
+  assert.equal(h.run('fetches.length'),1);
 });
 
 for (const [name, change] of Object.entries({

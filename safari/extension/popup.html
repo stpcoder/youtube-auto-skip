@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="popup.css">
+  <title>Focus</title>
+</head>
+<body>
+  <main>
+    <header><img src="icons/focus-48.png" width="40" height="40" alt=""><h1>Focus</h1></header>
+    <p class="intro">집중 보기</p>
+    <div class="settings">
+      <label><span>일반 사이트에서 적용하기</span><input id="global" type="checkbox" role="switch" disabled></label>
+      <label><span>이 사이트에서 적용하기</span><input id="site" type="checkbox" role="switch" disabled></label>
+    </div>
+    <fieldset class="features">
+      <legend>이 사이트의 기능</legend>
+      <label><span>기본 광고 공급자 차단</span><input type="checkbox" data-feature="providers" disabled></label>
+      <label><span>추가 배너 차단</span><input type="checkbox" data-feature="banners" disabled></label>
+      <label><span>팝업 차단</span><input type="checkbox" data-feature="popups" disabled></label>
+    </fieldset>
+    <button id="playback" hidden>재생 메뉴 열기</button>
+    <button id="diagnose">현재 페이지 검사</button>
+    <p id="status" role="status" hidden></p>
+    <p id="summary" role="status" hidden></p>
+    <details><summary>상세 진단</summary><pre id="diagnostics" hidden></pre></details>
+    <details class="tools"><summary>필터와 참고 도구</summary>
+      <ul>
+        <li><a href="https://github.com/easylist/easylist" target="_blank" rel="noopener noreferrer">EasyList</a> · 일반 공급자·배너 규칙</li>
+        <li><a href="https://github.com/yous/YousList" target="_blank" rel="noopener noreferrer">YousList</a> · 한국 사이트 규칙</li>
+        <li>Focus 추가 규칙 · 확인된 광고 주소·이미지</li>
+      </ul>
+      <p>필터 변환: AdGuard DNR Converter</p>
+      <p>설계 참고: uBlock Origin Lite, AdGuard prevent-window-open, RemoveAdblockThing, uAssets, PiPifier</p>
+      <p>참고 도구의 전체 엔진을 포함한 것은 아닙니다.</p>
+    </details>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>

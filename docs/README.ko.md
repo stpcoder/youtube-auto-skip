@@ -29,9 +29,9 @@ Node.js나 빌드는 설치에 필요하지 않습니다. GitHub의 Code → Dow
 
 ## iPhone / Safari
 
-YouTube 전용 Safari 확장은 별도 **개발판**입니다. YouTube 광고 처리, PiP 진입, 조건부 오디오 전용 재생 도구를 포함합니다. iPhone에는 확장을 담는 iOS 앱을 서명·설치해야 합니다.
+Safari 확장 소스 1.1.1은 별도 **개발판**입니다. Chrome과 공유하는 일반 광고 필터, YouTube 광고 처리·모바일 초기 로딩 복구, PiP·조건부 백그라운드 재생 도구를 포함합니다. 이전 공개 ZIP 1.0.0에는 이 변경이 없습니다. iPhone에는 확장을 담는 iOS 앱을 서명·설치해야 합니다.
 
-실제 iPhone의 PiP·홈 화면·잠금 화면 재생은 아직 검증하지 않았습니다. 오디오 전용 재생은 직접 재생 가능한 오디오 주소가 있는 영상에 한정됩니다. [설치 방법과 지원 범위](../safari/README.md)
+실제 iPhone의 PiP·홈 화면·잠금 화면 재생은 아직 검증하지 않았습니다. 백그라운드는 별도 오디오로 전환하지 않고 기존 동영상을 유지하며, iOS가 강제 중단하는 재생을 보장하지 않습니다. 일반 사이트 차단은 사이트 접근 권한이 필요합니다. [설치 방법과 지원 범위](../safari/README.md)
 
 ## 개발
 
@@ -66,7 +66,7 @@ npm run build:safari
 - `filters/`: 필터 원본, 변환 데이터와 출처·해시·지원 제한 기록.
 - `scripts/`: 필터 변환 및 Chrome/Safari 빌드 도구.
 - `tests/`: 자동 검사와 로컬 브라우저 재현 페이지.
-- `safari/`: YouTube 전용 Safari 확장 소스와 iPhone 설치 안내.
+- `safari/`: 일반 광고 차단·YouTube Safari 확장 소스와 iPhone 설치 안내.
 
 ## 지원 범위
 

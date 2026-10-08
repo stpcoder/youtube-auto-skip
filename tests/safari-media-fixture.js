@@ -15,6 +15,7 @@ document.getElementById('reject-audio').onclick=()=>{audioProvided=true;audioAll
 document.getElementById('resume-video').onclick=()=>mockVideo.play();
 document.getElementById('reject-pip').onclick=()=>{pipAllowed=false;mockVideo.webkitPresentationMode='inline';mockVideo.dispatchEvent(new Event('webkitpresentationmodechanged'))};
 document.getElementById('allow-pip').onclick=()=>{pipAllowed=true};
+document.getElementById('open-focus').onclick=()=>document.dispatchEvent(new Event('focus-show-playback'));
 document.getElementById('refresh-stats').onclick=()=>{document.getElementById('summary').textContent=JSON.stringify({media:JSON.parse(document.documentElement.dataset.yasSafariMediaStatus||'{}'),pauseCalls,skipClicks,overflow:document.documentElement.scrollWidth>innerWidth},null,2)};
 document.getElementById('show-skip').onclick=()=>{const b=document.createElement('button');b.className='ytm-ad-skip-button';b.textContent='모바일 광고 스킵';b.onclick=()=>{skipClicks++;b.remove()};document.getElementById('movie_player').append(b)};
 document.getElementById('next').onclick=()=>{history.pushState({},'','/watch?v=next');document.dispatchEvent(new Event('yt-navigate-finish'))};

@@ -65,6 +65,15 @@ test('pause removes existing styles and resume restores them',async()=>{
   h.settings.disabledSites=[];h.listeners.changed({},'local');await tick();
   assert.equal(h.status().applied,true);assert.equal(h.css.at(-1).remove,false);
 });
+test('banner and popup categories update independently while provider pause retains both',async()=>{
+  const h=harness();await tick();
+  h.settings.siteFeatures={'heye.kr':{providers:false,banners:true,popups:true}};h.listeners.changed({},'local');await tick();
+  assert.equal(h.status().applied,true);assert.equal(h.messages.at(-1).enabled,true);assert.equal(h.status().features.providers,false);
+  h.settings.siteFeatures['heye.kr'].banners=false;h.listeners.changed({},'local');await tick();
+  assert.equal(h.status().applied,false);assert.equal(h.messages.at(-1).enabled,true);
+  h.settings.siteFeatures['heye.kr']={providers:true,banners:true,popups:false};h.listeners.changed({},'local');await tick();
+  assert.equal(h.status().applied,true);assert.equal(h.messages.at(-1).enabled,false);
+});
 test('missing policy is reported explicitly without an uncaught domainRule error',()=>{
   const h=harness({missingPolicy:true});assert.match(h.status().error,/공통 광고 정책/);assert.equal(h.status().applied,false);
 });
@@ -84,7 +93,7 @@ test('native popup has an explicit intrinsic minimum without a viewport-width fe
 test('production content bundle works with all old shared-policy lookups forbidden',async()=>{
   const h=harness({bundled:true});await tick();
   assert.equal(h.status().error,null);assert.equal(h.status().applied,true);assert.equal(h.status().mode,'site-only');
-  assert.equal(h.status().selectors,12);assert.equal(h.status().siteSelectors,8);assert.equal(h.fetches(),0);
+  assert.equal(h.status().selectors,13);assert.equal(h.status().siteSelectors,8);assert.equal(h.fetches(),0);
 });
 test('compatibility ad-slot CSS applies even when the generic cosmetic file cannot load',async()=>{
   const h=harness({bundled:true,failFetch:true});await tick();assert.equal(h.status().applied,true);assert.equal(h.fetches(),0);
@@ -112,6 +121,14 @@ test('official generichide exceptions suppress generic names but keep specific a
   const applied=h.css.find(m=>!m.remove).css;
   assert.doesNotMatch(applied,/\.generic-ad|\.negative-only-ad/);assert.match(applied,/\.specific-ad/);
 });
+test('verified provider creatives retain explicit scope under generichide and honor selector exceptions',async()=>{
+  const selector='a[href]:has(img[src*="/known-ad.gif"])';
+  const rule={domains:[],selector,exception:false,verifiedProvider:true};
+  const h=harness({host:'accounts.google.com',importedRules:[rule]});await tick();
+  assert.equal(h.status().genericAllowed,false);assert.ok(h.css.find(m=>!m.remove).css.includes(selector));
+  const allowed=harness({host:'accounts.google.com',importedRules:[rule,{...rule,exception:true}]});await tick();
+  assert.ok(!allowed.css.find(m=>!m.remove).css.includes(selector));
+});
 test('generic hiding remains active on unrelated news sites, including negative-only rules',async()=>{
   const h=harness({host:'news.example.org',bundled:true,importedRules:commonRules});await tick();
   assert.equal(h.status().genericAllowed,true);assert.equal(h.status().specificAllowed,true);
@@ -137,7 +154,7 @@ test('specific hide policy keeps generic list rules, elemhide removes all cosmet
 test('selector exceptions also protect a matching explicit built-in selector',async()=>{
   const selector='[id^="enter_"]:has(> iframe[src^="//ad.ad4989.co.kr/"])';
   const h=harness({host:'news.example.org',bundled:true,importedRules:[{domains:['news.example.org'],selector,exception:true}]});await tick();
-  assert.equal(h.status().selectors,3);assert.ok(!h.css.find(m=>!m.remove).css.includes(selector));
+  assert.equal(h.status().selectors,4);assert.ok(!h.css.find(m=>!m.remove).css.includes(selector));
 });
 test('real maintained cosmetic snapshots work on multiple hosts beyond the compatibility fixture',async()=>{
   const importedRules=JSON.parse(read('filters/cosmetic.json'));

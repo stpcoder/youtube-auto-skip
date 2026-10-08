@@ -1,21 +1,33 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Safari 재생 도구",
-  "version": "1.0.0",
-  "description": "YouTube 광고 스킵, PiP 및 사용 가능한 오디오 전용 스트림의 재생을 돕습니다.",
-  "permissions": ["scripting"],
-  "host_permissions": ["https://www.youtube.com/*", "https://youtube.com/*", "https://m.youtube.com/*"],
-  "background": { "scripts": ["background.js"] },
+  "name": "Focus",
+  "version": "1.3.3",
+  "description": "Safari에서 YouTube와 웹페이지를 가볍게, 집중해서 보세요.",
+  "icons": { "48": "icons/focus-48.png", "128": "icons/focus-128.png" },
+  "permissions": ["scripting", "storage", "activeTab", "declarativeNetRequest"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "action": { "default_popup": "popup.html", "default_title": "Focus", "default_icon": "icons/focus-48.png" },
+  "declarative_net_request": { "rule_resources": [{ "id": "general_ads", "enabled": true, "path": "network.json" }] },
+  "web_accessible_resources": [{ "resources": ["cosmetic.json"], "matches": ["http://*/*", "https://*/*"] }],
+  "background": { "scripts": ["popup-policy.js", "background.js"] },
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/*", "https://youtube.com/*", "https://m.youtube.com/*"],
-      "js": ["bootstrap.js"],
+      "js": ["youtube-main.js"],
+      "world": "MAIN",
       "run_at": "document_start"
     },
     {
       "matches": ["https://www.youtube.com/*", "https://youtube.com/*", "https://m.youtube.com/*"],
-      "js": ["interruption-notice.js", "mobile-skip.js"],
+      "js": ["bootstrap.js", "interruption-notice.js", "mobile-skip.js"],
       "css": ["interruption-notice.css"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "exclude_matches": ["*://*.youtube.com/*", "*://youtube.com/*", "*://*.youtube-nocookie.com/*"],
+      "js": ["general-bootstrap.js", "general-content.js"],
+      "all_frames": true,
       "run_at": "document_start"
     }
   ]

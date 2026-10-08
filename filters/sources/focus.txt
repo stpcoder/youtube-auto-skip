@@ -1,0 +1,54 @@
+[Adblock Plus 2.0]
+! Title: Focus verified provider and creative rules
+! License: GPL-3.0-only
+! Observed: 2026-10-08, user-authorized physical iPhone Safari inspection
+! Provider/creative signatures apply across publishers, not site-wide blocks.
+! The external script identifies itself as onclick_static and installs popunders.
+||nfiolnpavrz.in/av/$script
+! Observed inline second-click advertising destination. Normal navigation stays allowed.
+||ethnicexpressions.org/4/$popup
+! TrafficStars SDK floating message advertisement, not the site's video player.
+##.ts-im-container
+! Verified advertising creatives on a shared image CDN. Never block the CDN itself.
+##a[href]:has(img[src*="/965249_0c31528e8d4b4d43883ee8ab88d8870d~mv2.gif"])
+##a[href]:has(img[src*="/965249_ee30a69f22114c18b881681a4981070d~mv2.gif"])
+##a[href]:has(img[src*="/965249_4323062735b147fca2fd770946856d07~mv2.gif"])
+##a[href]:has(img[src*="/965249_74b81c3799e84c46add74a25db08fbb7~mv2.gif"])
+##a[href]:has(img[src*="/965249_234fe7d701db46d396630e1e7e8ccad8~mv2.gif"])
+##a[href]:has(img[src*="/965249_bd7a0335b36c404a9f163a715db9feb5~mv2.gif"])
+##a[href]:has(img[src*="/965249_4556adde333b4bd4a4bf08dd9fc44bf6~mv2.gif"])
+##a[href]:has(img[src*="/965249_b1de49ef06cf47049a5122dcef199bde~mv2.gif"])
+##a[href]:has(img[src*="/965249_edc72f58408640d69ba700a35d21248d~mv2.gif"])
+##a[href]:has(img[src*="/965249_9544923f6f6c4d6abd84fd93d7fd5cd9~mv2.gif"])
+##a[href]:has(img[src*="/965249_f1ca9d691ea6461ca768db354256bba7~mv2.gif"])
+##a[href]:has(img[src*="/965249_30ada695c7524132b4162cef6cd35b05~mv2.gif"])
+##a[href]:has(img[src*="/965249_2051b716194341d48e0aef1df89d38ee~mv2.gif"])
+##a[href]:has(img[src*="/965249_43de5cf009e34ac6a0af9ec414d0f7eb~mv2.gif"])
+##a[href]:has(img[src*="/965249_92c1d545862049acb518b4c34bcd9f44~mv2.gif"])
+##a[href]:has(img[src*="/965249_83655de855a743c582aa629a5fcd22eb~mv2.gif"])
+! Small directory icons are shared with normal links; select only verified ad destinations.
+##a[href^="https://tg-0004.com/"]:has(img)
+##a[href^="http://zza-189.com/"]:has(img)
+! Verified first-party banner destinations. Also identify their popunder URLs.
+||hit4569.com^$popup
+||mdsb-2013.com^$popup
+||zr1652.com^$popup
+##a[href^="https://hit4569.com/"]:has(img)
+##a[href^="https://mdsb-2013.com/"]:has(img)
+##a[href^="https://zr1652.com/"]:has(img)
+! Collapse only ad-linked notices, leaving same-site and official-channel notices.
+##.hd_pops:has(> .hd_pops_con > a[href^="https://mdsb-2013.com/"])
+##.hd_pops:has(> .hd_pops_con > a[href^="https://zr1652.com/"])
+! This SDK creates an advertising panel in a closed shadow root (.mb_ai_div).
+! Path-specific rule preserves the site's normal video player and shared CDN.
+||cdn.megadata.co.kr/dist/prod/aiBanner.js$script
+##.mb_ai_div
+! Observed shared banner templates: select advertising image slots, not article thumbnails.
+! Preserve official channel notices even when they reuse the same banner template.
+##.banner_box > .banner:has(> a > img[src*="/storage/banner/"]):not(:has(> a[href^="https://t.me/"]))
+###popupBanner .banner:has(> a > img[src*="/storage/banner/"]):not(:has(> a[href^="https://t.me/"]))
+##a.grid-asset:has(> img[src*="/theme/movie/img/banners/"]):not([href^="https://t.me/"])
+! A verified ad-only notice must not leave a full-screen touch shield behind.
+! Keep the backdrop while any normal notice is present; react when it is closed.
+##.hd_pops[data-focus-ad-slot="true"]
+##.popup_container:has(> .popup_wrapper > .hd_pops[data-focus-ad-slot="true"]):not(:has(> .popup_wrapper > .hd_pops:not([data-focus-ad-slot="true"])))

@@ -5,6 +5,30 @@
   function enabled(host, settings = {}) {
     return settings.globalEnabled !== false && !(settings.disabledSites || []).some(d => hostMatches(host, d));
   }
+  const featureDefaults = Object.freeze({ providers: true, banners: true, popups: true });
+  const validHost = host => typeof host === 'string' && /^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)*[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(host);
+  function featurePreferences(host, settings = {}) {
+    const result = { ...featureDefaults };
+    const overrides = settings.siteFeatures && typeof settings.siteFeatures === 'object' ? settings.siteFeatures : {};
+    for (const domain of Object.keys(overrides).filter(d => validHost(d) && hostMatches(host, d)).sort((a,b) => a.length-b.length)) {
+      const values = overrides[domain];
+      for (const key of Object.keys(result)) if (typeof values?.[key] === 'boolean') result[key] = values[key];
+    }
+    return result;
+  }
+  function features(host, settings = {}) {
+    const result = featurePreferences(host, settings);
+    if (!enabled(host, settings)) for (const key of Object.keys(result)) result[key] = false;
+    return result;
+  }
+  function networkExceptions(settings = {}) {
+    const domains = [...new Set([...(settings.disabledSites || []), ...Object.keys(settings.siteFeatures || {})])].filter(validHost);
+    return domains.filter(d => !features(d, settings).providers).map(domain => ({
+      domain,
+      // A child can opt back in without undoing a parent's network exception.
+      excluded: domains.filter(d => d !== domain && hostMatches(d, domain) && features(d, settings).providers),
+    }));
+  }
   function adUrl(value, base, hosts) {
     if (typeof value !== 'string') return false;
     try {
@@ -42,6 +66,30 @@
     }
     return result;
   }
+  function popupMatcher(rules = [], hosts = new Set()) {
+    // Compile lazily: ordinary page loads need not initialize thousands of regexes.
+    let compiled;
+    const cache = new Map();
+    return (value, source) => {
+      if (typeof value !== 'string') return false;
+      let url, origin;
+      try {
+        url = new URL(value, source); origin = new URL(source);
+        if (!supported(url) || !supported(origin)) return false;
+        url.username = ''; url.password = '';
+      } catch { return false; }
+      const key = origin.hostname + ' ' + url.href;
+      if (cache.has(key)) return cache.get(key);
+      const remember = value => { if (cache.size >= 1024) cache.delete(cache.keys().next().value); cache.set(key, value); return value; };
+      compiled ||= rules.map(r => ({ ...r, test: new RegExp(r.regex, r.flags) }));
+      for (const rule of compiled) {
+        if (!rule.exception) continue;
+        if (!domainRule(origin.hostname, rule.domains) || !rule.test.test(url.href)) continue;
+        return remember(false);
+      }
+      return remember(adUrl(url.href, origin.href, hosts) || compiled.some(rule => !rule.exception && domainRule(origin.hostname, rule.domains) && rule.test.test(url.href)));
+    };
+  }
   // Standalone test export; production bundles embed the value lexically.
-  globalThis.__YAS_GENERAL_POLICY_V3__ = Object.freeze({ hostMatches, enabled, adUrl, domainRule, cosmeticPolicy });
+  globalThis.__YAS_GENERAL_POLICY_V3__ = Object.freeze({ hostMatches, enabled, featurePreferences, features, networkExceptions, adUrl, domainRule, cosmeticPolicy, popupMatcher });
 })();

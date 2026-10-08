@@ -2,17 +2,20 @@
 importScripts('general/rule-data.js', 'general/policy.js');
 const generalPolicy = globalThis.__YAS_GENERAL_POLICY_V3__;
 const popupAdHosts = new Set(globalThis.__YAS_GENERAL_DATA_V3__.popupHosts);
+const popupMatch = generalPolicy.popupMatcher(globalThis.__YAS_GENERAL_POPUP_RULES_V3__ || [], popupAdHosts);
 const createdPopupTabs = new Map();
 let generalSettings = { globalEnabled: false, disabledSites: [] }, generalSync = Promise.resolve();
 
 function syncGeneralRules() {
   generalSync = generalSync.catch(() => {}).then(async () => {
-    generalSettings = await chrome.storage.local.get({ globalEnabled: true, disabledSites: [] });
+    generalSettings = await chrome.storage.local.get({ globalEnabled: true, disabledSites: [], siteFeatures: {} });
     const old = await chrome.declarativeNetRequest.getDynamicRules();
-    const addRules = generalSettings.globalEnabled ? generalSettings.disabledSites.map((domain, i) => ({
+    const exceptions = generalPolicy.networkExceptions(generalSettings);
+    if (exceptions.length > 500) throw Error('Too many site exceptions');
+    const addRules = generalSettings.globalEnabled ? exceptions.map(({domain, excluded}, i) => ({
       id: 1000000 + i, priority: 100000,
       action: { type: 'allowAllRequests' },
-      condition: { requestDomains: [domain], resourceTypes: ['main_frame', 'sub_frame'] },
+      condition: { requestDomains: [domain], ...(excluded.length ? { excludedRequestDomains: excluded } : {}), resourceTypes: ['main_frame', 'sub_frame'] },
     })) : [];
     await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: old.filter(r => r.id >= 1000000 && r.id < 1001000).map(r => r.id), addRules });
     await chrome.declarativeNetRequest.updateEnabledRulesets({
@@ -28,7 +31,7 @@ function syncGeneralRules() {
 chrome.runtime.onInstalled.addListener(syncGeneralRules);
 chrome.runtime.onStartup.addListener(syncGeneralRules);
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === 'local' && (changes.globalEnabled || changes.disabledSites)) syncGeneralRules();
+  if (area === 'local' && (changes.globalEnabled || changes.disabledSites || changes.siteFeatures)) syncGeneralRules();
 });
 syncGeneralRules();
 
@@ -40,6 +43,10 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       !/^https?:\/\//.test(sender.url || '')) return false;
   if (message?.type === 'YAS_FRAME_CONTEXT') {
     reply({ host: tabHost(sender.tab) }); return false;
+  }
+  if (message?.type === 'YAS_AD_CANDIDATES' && Array.isArray(message.urls) && message.urls.length <= 300 && message.urls.every(u => typeof u === 'string' && u.length <= 4096)) {
+    generalSync.then(() => reply({ matches: generalPolicy.features(tabHost(sender.tab), generalSettings).banners ? message.urls.filter(url => popupMatch(url, sender.url)) : [] })).catch(() => reply({ matches: [] }));
+    return true;
   }
   if (message?.type !== 'YAS_GENERAL_CSS' || typeof message.css !== 'string' ||
       message.css.length > 2000000 || typeof message.remove !== 'boolean') return false;
@@ -55,17 +62,18 @@ async function closeAdPopup(tabId, url) {
   await popup.ready;
   await generalSync;
   if (createdPopupTabs.get(tabId) !== popup) return;
-  if (!generalPolicy.enabled(popup.sourceHost, generalSettings) || !generalPolicy.adUrl(url, url, popupAdHosts)) return;
+  if (!generalPolicy.features(popup.sourceHost, generalSettings).popups || !popupMatch(url, popup.sourceURL)) return;
   createdPopupTabs.delete(tabId);
   try { await chrome.tabs.remove(tabId); } catch { /* Already closed by the user. */ }
 }
 chrome.webNavigation.onCreatedNavigationTarget.addListener(async details => {
-  const popup = { created: Date.now(), sourceHost: '', ready: null };
+  const popup = { created: Date.now(), sourceHost: '', sourceURL: '', ready: null };
   createdPopupTabs.set(details.tabId, popup);
   if (createdPopupTabs.size > 256) createdPopupTabs.delete(createdPopupTabs.keys().next().value);
   popup.ready = (async () => {
     await generalSync;
-    popup.sourceHost = tabHost(await chrome.tabs.get(details.sourceTabId));
+    const source = await chrome.tabs.get(details.sourceTabId);
+    popup.sourceHost = tabHost(source); popup.sourceURL = source.url;
   })();
   try {
     await popup.ready;
@@ -78,6 +86,9 @@ chrome.webNavigation.onBeforeNavigate.addListener(details => {
 });
 chrome.webNavigation.onCommitted.addListener(details => {
   // Once a legitimate destination is loaded, never close that tab later.
-  if (details.frameId === 0 && !generalPolicy.adUrl(details.url, details.url, popupAdHosts)) createdPopupTabs.delete(details.tabId);
+  const popup = createdPopupTabs.get(details.tabId);
+  if (details.frameId === 0 && popup) popup.ready.then(() => {
+    if (createdPopupTabs.get(details.tabId) === popup && !popupMatch(details.url, popup.sourceURL)) createdPopupTabs.delete(details.tabId);
+  }).catch(() => createdPopupTabs.delete(details.tabId));
 });
 chrome.tabs.onRemoved.addListener(tabId => createdPopupTabs.delete(tabId));

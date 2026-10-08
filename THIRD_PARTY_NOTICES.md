@@ -2,6 +2,8 @@
 
 Project-owned code is distributed under [GPL-3.0-only](LICENSE). Filter datasets retain their separate licenses and source attribution.
 
+`filters/sources/focus.txt` contains independently authored, live-observed provider and creative signatures under GPL-3.0-only. It is not an upstream EasyList/YousList or AdGuard dataset. Plain unconditional host blocks are grouped into bounded `requestDomains` rules; exceptions, badfilter overrides and conditional/path rules retain separate handling. Popup-only URL filters are compiled as local data. Unsupported constructs are reported, never loaded as remote executable code.
+
 | Source | Attribution | License | Changes and outputs |
 | --- | --- | --- | --- |
 | [EasyList](https://github.com/easylist/easylist) | EasyList authors and contributors | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) | Network conversion, native cosmetics and cosmetic-policy exceptions; `filters/`, `general/rule-data.js` and generated bundle data |
@@ -21,5 +23,6 @@ The bounded YouTube recovery also references the `eafg` request condition in [uB
 - **AdGuard prevent-window-open**: https://github.com/AdguardTeam/Scriptlets/blob/master/src/scriptlets/prevent-window-open.js. URL 조건으로 `window.open`을 차단하는 설계를 확인했습니다. 이 파일의 구현을 복사하지 않았으며, 이 프로젝트의 좁은 URL 정책은 독립 구현입니다.
 - **uBlock Origin Lite**: https://github.com/uBlockOrigin/uBOL-home 및 https://github.com/gorhill/uBlock/tree/01092d95dbc7d91599a5ad017d5b98aba1118659/platform/mv3 . GPL-3.0인 upstream의 일반/사이트별 CSS·예외 분리, 등록 방식, 고급 필터 지원 범위를 설계 비교용으로 읽었습니다. 실행 코드·스크립틀릿을 복사하거나 이 확장에 포함하지 않았습니다. 이 프로젝트의 화면 숨김 예외 파서와 실행 로직은 독립 구현입니다.
 - **PiPifier**: https://github.com/arnoappenzeller/PiPifier, MIT. Safari의 `webkitSetPresentationMode` 호출 경로를 참고했습니다. 구현 코드를 복사하지 않았습니다.
+- **Background Playback Helper**: https://github.com/phase3dev/background-playback-helper-youtube, MIT. 명시적으로 켜고 해제하는 가시성 처리 개념을 검토했습니다. 구현 코드를 복사하지 않았으며 Firefox/Android 지원 주장을 iOS 지원 증거로 사용하지 않습니다. Safari 필터 출력에도 위 EasyList·YousList 출처와 라이선스가 적용됩니다.
 
 필터 수집 시각·SHA-256·규칙 수·변환 제한은 `filters/provenance.json`에 기록합니다. 원격 실행 코드는 받아들이지 않습니다.

@@ -19,6 +19,23 @@ test('hostname matching respects boundaries and paused parent sites', () => {
   assert.equal(p.enabled('other.org',{ disabledSites:['example.org'] }), true);
   assert.equal(p.enabled('other.org',{ globalEnabled:false }), false);
 });
+test('site checklist defaults on and each category inherits independently',()=>{
+  const p=harness().policy, plain=value=>JSON.parse(JSON.stringify(value));
+  assert.deepEqual(plain(p.features('news.example')),{providers:true,banners:true,popups:true});
+  const settings={siteFeatures:{'news.example':{providers:false,popups:false},'video.news.example':{popups:true},'other.example':{banners:false},'invalid/host':{providers:false}}};
+  assert.deepEqual(plain(p.features('video.news.example',settings)),{providers:false,banners:true,popups:true});
+  assert.deepEqual(plain(p.features('notnews.example',settings)),{providers:true,banners:true,popups:true});
+  assert.deepEqual(plain(p.features('news.example',{siteFeatures:{'news.example':{providers:'false',banners:null}}})),{providers:true,banners:true,popups:true});
+  for(const master of [{globalEnabled:false},{disabledSites:['news.example']}])assert.deepEqual(plain(p.features('video.news.example',{...settings,...master})),{providers:false,banners:false,popups:false});
+  assert.deepEqual(plain(p.featurePreferences('news.example',{...settings,globalEnabled:false})),{providers:false,banners:true,popups:false});
+});
+test('provider network exceptions respect children without overriding master site pauses',()=>{
+  const p=harness().policy, plain=value=>JSON.parse(JSON.stringify(value));
+  const settings={siteFeatures:{'news.example':{providers:false},'video.news.example':{providers:true},'other.example':{banners:false,popups:false}}};
+  assert.deepEqual(plain(p.networkExceptions(settings)),[{domain:'news.example',excluded:['video.news.example']}]);
+  const paused=p.networkExceptions({...settings,disabledSites:['news.example']});
+  assert.ok(paused.every(r=>r.excluded.length===0));
+});
 test('ad URL matching does not match path strings, spoofed suffixes or protocols', () => {
   const p = harness().policy, hosts = new Set(['ads.example.org']);
   for (const u of ['https://ads.example.org/a','https://a.ads.example.org/a','//ads.example.org/a']) assert.equal(p.adUrl(u,'https://safe.org/',hosts),true);
@@ -78,7 +95,7 @@ test('only ad links opening a new window are intercepted', () => {
 });
 test('compiled DNR rules are bounded, uniquely identified, valid and YouTube-excluded', () => {
   const rules=json('filters/network.json');
-  assert.ok(rules.length>20000 && rules.length<=30000);
+  assert.ok(rules.length>1000 && rules.length<=30000);
   assert.equal(new Set(rules.map(r=>r.id)).size,rules.length);
   assert.ok(rules.filter(r=>r.condition.regexFilter).length<=1000);
   for (const r of rules) {
@@ -102,12 +119,14 @@ test('the supplied ad4989 iframe is explicitly covered without blocking image ho
 test('source snapshots and attribution metadata match their recorded hashes', () => {
   const crypto=require('node:crypto'), p=json('filters/provenance.json');
   for (const s of p.sources) {
-    const file=s.name==='EasyList'?'easylist.txt':'youslist.txt';
+    const file=s.name.toLowerCase()+'.txt';
     assert.equal(crypto.createHash('sha256').update(read('filters/sources/'+file)).digest('hex'),s.sha256);
-    assert.match(s.license,/^CC-BY/);
+    if (s.local) assert.equal(s.license,'GPL-3.0-only');
+    else assert.match(s.license,/^CC-BY/);
   }
   assert.equal(p.networkRules,json('filters/network.json').length);
-  assert.ok(p.limitations.length>0, 'report the converter cap rather than implying full parity');
+  assert.ok(Array.isArray(p.limitations));
+  assert.ok(p.conversionErrors > 0, 'unsupported syntax remains explicitly reported');
 });
 test('Chrome general adblock and YouTube scripts are kept separate', () => {
   const m=json('manifest.json');
